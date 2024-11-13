@@ -33,6 +33,8 @@ class AppImages{
   static const editicon = 'assets/images/editicon.png';
   static const withdraw = 'assets/images/withdraw.png';
   static const arrow_right = 'assets/images/arrow_right.png';
+  static const upload_img = 'assets/images/upload_img.png';
+
 
   //balaj
   static const jared_hughs = 'assets/images/jared_hughs.png';

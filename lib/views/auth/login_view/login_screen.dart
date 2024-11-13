@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:repairoo/const/text_styles.dart';
+import 'package:repairoo/controllers/signup_controller.dart';
 import 'package:repairoo/views/auth/otp_verification/otp_verification.dart';
+import 'package:repairoo/views/auth/signup_view/role_screen.dart';
 
 import '../../../const/color.dart';
 import '../../../const/images.dart';
@@ -16,6 +19,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final SignupController signupController = Get.put(SignupController());
+
   // FocusNode _phoneFocusNode = FocusNode();
   // @override
   // void dispose() {
@@ -98,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          SizedBox(
+              SizedBox(
                 height: 76.h,
               ),
               Padding(
@@ -106,23 +111,36 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: CustomElevatedButton(
                   text: 'Login',
                   textColor: AppColors.primary,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return OtpAuthenticationView(); // Replace with your desired screen/widget
-                        },
-                      ),
-                    );
-
-                    // Button action
+                  onPressed:(){
+                    signupController.sendOTP(signupController.phonenumber.text);
                   },
 
                   backgroundColor:
-                      AppColors.secondary, // Custom background color
+                  AppColors.secondary, // Custom background color
                 ),
-              )
+              ),
+              SizedBox(
+                height: 40.h,
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return RoleScreen(); // Replace with your desired screen/widget
+                      },
+                    ),
+                  );
+                },
+                child: Text(
+                  'Doesn’t have account? Signup',
+                  style: jost700(15.sp, AppColors.secondary),
+                ),
+              ),
+              SizedBox(
+                height: 91.h,
+              ),
             ],
           ),
         ),

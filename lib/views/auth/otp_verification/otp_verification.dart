@@ -12,8 +12,10 @@ import '../signup_view/role_screen.dart';
 
 class OtpAuthenticationView extends StatefulWidget {
   // final String email;
+  final String verificationId;
+  final String docId;
   OtpAuthenticationView({
-    super.key,
+    super.key,required this.verificationId, required this.docId,
   });
 
   @override

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "624738259232",
+    "project_id": "reapairoo",
+    "storage_bucket": "reapairoo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624738259232:android:0a2ed2c41336efa836c745",
+        "android_client_info": {
+          "package_name": "com.example.repairoo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEHD4eAaC7aJ3JTBdLih1jP03Tx2k7qQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
