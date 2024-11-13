@@ -1,0 +1,22 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_b_104_4625)">
+<path d="M19.517 14.4416L18.5555 12.8455C18.3536 12.4898 18.1709 11.8168 18.1709 11.4225V8.98997C18.1709 7.80684 17.8071 6.70806 17.1858 5.79856C16.0826 4.18372 14.4057 2.43262 12.4501 2.43262C10.4775 2.43262 8.80454 4.23179 7.71951 5.87918C7.1305 6.77348 6.78689 7.84227 6.78689 8.98997V11.4225C6.78689 11.8168 6.60421 12.4898 6.4023 12.8359L5.43119 14.4416C5.0466 15.0858 4.96006 15.7973 5.20043 16.4511C5.43119 17.0953 5.97924 17.5953 6.69074 17.8357C8.55603 18.4703 10.5175 18.7779 12.4789 18.7779C14.4403 18.7779 16.4018 18.4703 18.2671 17.8453C18.9401 17.6241 19.4593 17.1146 19.7093 16.4511C19.9593 15.7877 19.892 15.057 19.517 14.4416Z" fill="white"/>
+</g>
+<g filter="url(#filter1_b_104_4625)">
+<path d="M14.7093 19.8066C14.9256 19.7795 15.0897 19.9899 14.983 20.18C14.4866 21.0642 13.5415 21.6622 12.4594 21.6622C11.6999 21.6622 10.9499 21.3546 10.4211 20.8065C10.2076 20.6064 10.0312 20.36 9.89822 20.0963C9.81882 19.9388 9.95805 19.7624 10.1326 19.7873C10.3538 19.8162 10.5845 19.845 10.8153 19.8643C11.3633 19.9123 11.921 19.9412 12.4787 19.9412C13.0267 19.9412 13.5748 19.9123 14.1132 19.8643C14.3151 19.845 14.517 19.8354 14.7093 19.8066Z" fill="#BDD0EA"/>
+</g>
+<defs>
+<filter id="filter0_b_104_4625" x="-16.6336" y="-19.2674" width="58.191" height="59.7457" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feGaussianBlur in="BackgroundImageFix" stdDeviation="10.85"/>
+<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_104_4625"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_104_4625" result="shape"/>
+</filter>
+<filter id="filter1_b_104_4625" x="-11.825" y="-1.91484" width="48.5416" height="45.277" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feGaussianBlur in="BackgroundImageFix" stdDeviation="10.85"/>
+<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_104_4625"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_104_4625" result="shape"/>
+</filter>
+</defs>
+</svg>
