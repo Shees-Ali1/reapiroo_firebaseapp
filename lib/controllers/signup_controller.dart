@@ -43,7 +43,22 @@ class SignupController extends GetxController {
       imageFile.value = File(pickedFile.path); // Update reactively
     }
   }
+  Future<bool> loginWithEmailPassword(String email, String password) async {
+    try {
+      // Your login logic here
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
 
+      if (userCredential.user != null) {
+        return true; // Login successful
+      } else {
+        return false; // Login failed
+      }
+    } catch (e) {
+      print('Error logging in: $e');
+      return false; // Login failed
+    }
+  }
   // Function to upload image to Firebase Storage and get the URL
   Future<void> uploadImage(String userId) async {
     if (imageFile.value == null) return; // Exit if no image selected
