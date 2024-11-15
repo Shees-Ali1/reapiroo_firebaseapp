@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:repairoo/const/text_styles.dart';
+import 'package:repairoo/controllers/signup_controller.dart';
 import 'package:repairoo/controllers/user_controller.dart';
 import 'package:repairoo/views/auth/signup_view/tech_signup.dart';
 
@@ -19,11 +21,8 @@ class RoleScreen extends StatefulWidget {
 }
 
 class _RoleScreenState extends State<RoleScreen> {
-
   final UserController userVM = Get.find<UserController>();
-
-  int selectedIndex = 0;
-
+  final SignupController signupController = Get.find<SignupController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,15 +63,17 @@ class _RoleScreenState extends State<RoleScreen> {
             children: [
               GestureDetector(
                 onTap: () {
-                  userVM.userRole.value = "Customer";
-                  setState(() {
-                    selectedIndex = 0;
-                  });
+                  signupController.userRole.value = "Customer";
+                  signupController.selectedIndex.value = 0;
+                  if (kDebugMode) {
+                    print(signupController.userRole.value);
+                  }
+
                 },
                 child: buildContainer(
                   'Customer',
                   AppImages.Customer,
-                  isSelected: selectedIndex == 0,
+                  isSelected: signupController.selectedIndex == 0,
                 ),
               ),
               SizedBox(
@@ -80,15 +81,13 @@ class _RoleScreenState extends State<RoleScreen> {
               ),
               GestureDetector(
                 onTap: () {
-                  userVM.userRole.value = "Tech";
-                  setState(() {
-                    selectedIndex = 1;
-                  });
+                  signupController.userRole.value = "Tech";
+                  signupController.selectedIndex.value = 1;
                 },
                 child: buildContainer(
                   'Tech',
                   AppImages.Engineer,
-                  isSelected: selectedIndex == 1,
+                  isSelected: signupController.selectedIndex == 1,
                 ),
               ),
             ],
@@ -102,7 +101,7 @@ class _RoleScreenState extends State<RoleScreen> {
               text: 'Continue',
               textColor: AppColors.secondary,
               onPressed: () {
-                if (selectedIndex == 0) {
+                if (signupController.selectedIndex.value == 0) {
                   // Navigate to Customer Signup
                   Navigator.push(
                     context,
@@ -110,7 +109,7 @@ class _RoleScreenState extends State<RoleScreen> {
                       builder: (context) => CustomerSignup(),
                     ),
                   );
-                } else if (selectedIndex == 1) {
+                } else if (signupController.selectedIndex.value == 1) {
                   // Navigate to Tech Signup
                   Navigator.push(
                     context,

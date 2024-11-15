@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:repairoo/views/auth/login_view/login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../views/auth/otp_verification/otp_verification.dart';
 
@@ -29,44 +30,73 @@ class SignupController extends GetxController {
   final TextEditingController email = TextEditingController();
   final TextEditingController phonenumber = TextEditingController();
 
-  File? imageFile; // Store the image path
-  var uploadedImageUrl = ''.obs; // Store the uploaded image URL
+  var imageFile = Rxn<File>(); // Declare as Rxn<File>() for reactivity
 
-  void pickImage(ImageSource source) async {
+  var uploadedImageUrl = ''.obs; // Store the uploaded image URL
+  // var isLoading = false.obs; // Track loading state
+
+  void pickImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(source: source);
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      imageFile = File(pickedFile.path); // Store the selected image file
-      // imagePath.value = pickedFile.path; // Update observable for UI
-      await uploadImage(pickedFile);
-      update(); // Notify listeners about the change if using GetX
+      imageFile.value = File(pickedFile.path); // Update reactively
     }
   }
 
-// Function to upload image to Firebase Storage and get the URL
-  Future<void> uploadImage(XFile imageFile) async {
+  // Function to upload image to Firebase Storage and get the URL
+  Future<void> uploadImage(String userId) async {
+    if (imageFile.value == null) return; // Exit if no image selected
     try {
-      // Create a reference to the Firebase Storage location
-      String fileName =
-          '${DateTime.now().millisecondsSinceEpoch}_${imageFile.name}'; // Unique file name
+      isLoading.value = true;
+
+      // Get a reference to the Firebase Storage location
       Reference storageReference = FirebaseStorage.instance
           .ref()
           .child('profile_images')
-          .child(fileName);
+          .child('$userId.jpg'); // Customize the file name as needed
 
-      // Convert XFile to File and upload
-      File fileToUpload = File(imageFile.path); // Get the path from XFile
-      UploadTask uploadTask = storageReference.putFile(fileToUpload);
+      // Upload the image
+      UploadTask uploadTask = storageReference.putFile(imageFile.value!);
       TaskSnapshot taskSnapshot = await uploadTask;
-
       // Get the download URL of the uploaded image
       String imageUrl = await taskSnapshot.ref.getDownloadURL();
-      // Optionally: Use the imageUrl as needed, e.g., save to Firestore or display
+      uploadedImageUrl.value = imageUrl; // Update the URL reactively
     } catch (e) {
-      Get.snackbar("Error", "Image upload failed: $e"); // Show error message
+      print('Error uploading image to Firebase Storage: $e');
+    } finally {
+      isLoading.value = false;
     }
   }
+
+  // Future<void> uploadImage(XFile imageFile) async {
+  //   try {
+  //     // Check if user is authenticated
+  //     // User? user = FirebaseAuth.instance.currentUser;
+  //     // if (user == null) {
+  //     //   Get.snackbar("Error", "User is not authenticated.");
+  //     //   return;
+  //     // }
+  //
+  //     // Create a reference to the Firebase Storage location
+  //     String fileName = '${DateTime.now().millisecondsSinceEpoch}_${imageFile.name}';
+  //     Reference storageReference = FirebaseStorage.instance
+  //         .ref()
+  //         .child('profile_images')
+  //         .child(fileName);
+  //
+  //     // Convert XFile to File and upload
+  //     File fileToUpload = File(imageFile.path);
+  //     UploadTask uploadTask = storageReference.putFile(fileToUpload);
+  //     TaskSnapshot taskSnapshot = await uploadTask;
+  //
+  //     // Get the download URL of the uploaded image
+  //     String imageUrl = await taskSnapshot.ref.getDownloadURL();
+  //     // Optionally: Use the imageUrl as needed
+  //   } catch (e) {
+  //     Get.snackbar("Error", "Image upload failed: $e");
+  //   }
+  // }
 
   Future<void> signup() async {
     try {
@@ -90,9 +120,19 @@ class SignupController extends GetxController {
   }
 
   void sendOTP(String phoneNumber) async {
+    // Ensure the phone number is not empty, starts with "+92", and is of correct length
+    if (phoneNumber.isEmpty || !phoneNumber.startsWith('+92') || phoneNumber.length != 13) {
+      Get.snackbar(
+        'Invalid Phone Number',
+        'Please enter a valid Pakistani phone number with the country code +92 (e.g., +923001234567).',
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+      );
+      return;
+    }
+
     try {
-      // setOtp(true);
-      print('PhoneNumbers added: ${phoneNumber}');
+      print('Phone number added: $phoneNumber');
 
       await _auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
@@ -101,9 +141,9 @@ class SignupController extends GetxController {
           await _auth.signInWithCredential(credential);
           Get.snackbar(
             'Verified',
-            'Phone number automatically verified and user signed in: ${credential}',
+            'Phone number automatically verified and user signed in: $credential',
             backgroundColor: Colors.white,
-            colorText: Colors.white,
+            colorText: Colors.black,
           );
         },
         verificationFailed: (FirebaseAuthException e) {
@@ -113,7 +153,6 @@ class SignupController extends GetxController {
             backgroundColor: Colors.white,
             colorText: Colors.black,
           );
-          // setOtp(false);
           print('Verification failed. Code: ${e.code}. Message: ${e.message}');
         },
         codeSent: (String verificationId, int? resendToken) async {
@@ -135,20 +174,19 @@ class SignupController extends GetxController {
             'userId': FirebaseAuth.instance.currentUser?.uid,
           });
 
-          // setOtp(false);
           Get.to(() => OtpAuthenticationView(
               verificationId: verificationId, docId: phoneNumber));
         },
         codeAutoRetrievalTimeout: (String verificationId) {
-    VerificationId.value = verificationId;
-          // setOtp(false);
+          VerificationId.value = verificationId;
         },
       );
     } catch (e) {
-      // setOtp(false);
       print('Error sending OTP: $e');
     }
   }
+
+
 
   Future<void> saveUserData(String uid) async {
     await _firestore.collection('userDetails').doc(uid).set({

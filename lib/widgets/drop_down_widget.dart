@@ -5,12 +5,15 @@ import 'package:repairoo/const/color.dart';
 import 'package:repairoo/const/text_styles.dart';
 import 'package:repairoo/controllers/drop_down_controller.dart';
 
+import '../controllers/signup_controller.dart';
+
 class GenderDropdownField extends StatelessWidget {
   final String label;
   final String iconPath; // String for image path
   final double iconHeight; // Height of the icon
   final double iconWidth; // Width of the icon
   final GenderController genderController = Get.put(GenderController()); // Inject the controller
+  final SignupController signupController = Get.put(SignupController()); // Inject the controller
 
   GenderDropdownField({
     required this.label,
@@ -28,9 +31,9 @@ class GenderDropdownField extends StatelessWidget {
         borderRadius: BorderRadius.circular(13.31.r), // Match with the input decoration
       ),
       child: DropdownButtonFormField<String>(
-        value: genderController.selectedGender.value.isEmpty
+        value: signupController.selectedGender.value.isEmpty
             ? null
-            : genderController.selectedGender.value, // Bind the value to the controller's observable
+            : signupController.selectedGender.value, // Bind the value to the controller's observable
         decoration: InputDecoration(
           filled: true, // Enable filled background
           fillColor: AppColors.fill, // Set fill color
@@ -82,7 +85,7 @@ class GenderDropdownField extends StatelessWidget {
           );
         }).toList(),
         onChanged: (String? newValue) {
-          genderController.updateGender(newValue); // Update the controller on change
+          signupController.updateGender(newValue); // Update the controller on change
         },
         dropdownColor: AppColors.fill, // Set dropdown background color
         iconEnabledColor: Colors.black, // Set icon color to black

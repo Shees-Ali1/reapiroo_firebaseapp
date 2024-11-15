@@ -37,43 +37,44 @@ class _CustomerSignupState extends State<CustomerSignup> {
     // signupController.imageFile?.clear();
   }
 
-  void _showImageSourceDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "Choose an Option",
-            style: jost400(16, AppColors.primary),
-          ),
-          content: SizedBox(
-            // Wrap content in a SizedBox to limit height and improve layout
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    signupController.pickImage(ImageSource.gallery); // Pick image from gallery
-                  },
-                  child: Text('Gallery', style: jost400(14.sp, AppColors.primary)),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    signupController.pickImage(ImageSource.camera); // Take photo with camera
-                  },
-                  child: Text('Camera', style: jost400(14.sp, AppColors.primary)),
-                ),
-              ],
-            ),
-          ),
-          backgroundColor: AppColors.secondary,
-        );
-      },
-    );
-  }
+
+  // void _showImageSourceDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: Text(
+  //           "Choose an Option",
+  //           style: jost400(16, AppColors.primary),
+  //         ),
+  //         content: SizedBox(
+  //           // Wrap content in a SizedBox to limit height and improve layout
+  //           width: double.maxFinite,
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               TextButton(
+  //                 onPressed: () {
+  //                   Navigator.pop(context);
+  //                   signupController.pickImage(ImageSource.gallery); // Pick image from gallery
+  //                 },
+  //                 child: Text('Gallery', style: jost400(14.sp, AppColors.primary)),
+  //               ),
+  //               TextButton(
+  //                 onPressed: () {
+  //                   Navigator.pop(context);
+  //                   signupController.pickImage(ImageSource.camera); // Take photo with camera
+  //                 },
+  //                 child: Text('Camera', style: jost400(14.sp, AppColors.primary)),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         backgroundColor: AppColors.secondary,
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -115,21 +116,22 @@ class _CustomerSignupState extends State<CustomerSignup> {
                     ),
                     SizedBox(height: 30.h),
                     GestureDetector(
-                        onTap: () => _showImageSourceDialog(context),
-                        child: Container(
+                      onTap: () => signupController.pickImage(),
+                      child: Obx(
+                            () => Container(
                           width: 106.w,
                           height: 106.h,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
-                            image: signupController.imageFile != null
+                            image: signupController.imageFile.value != null
                                 ? DecorationImage(
-                              image: FileImage(signupController.imageFile!), // Use the imageFile if it's not null
+                              image: FileImage(signupController.imageFile.value!),
                               fit: BoxFit.cover,
                             )
                                 : null,
                           ),
-                          child: signupController.imageFile == null // Show upload icon if no image is selected
+                          child: signupController.imageFile.value == null
                               ? Center(
                             child: SizedBox(
                               height: 50.h,
@@ -140,10 +142,11 @@ class _CustomerSignupState extends State<CustomerSignup> {
                               ),
                             ),
                           )
-                              : null, // No child if image is present
-                        )
-
+                              : null,
+                        ),
+                      ),
                     ),
+
 
 
 

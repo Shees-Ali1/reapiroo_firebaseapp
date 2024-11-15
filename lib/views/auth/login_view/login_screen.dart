@@ -98,7 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               initialCountryCode: 'AE',
               onChanged: (phone) {
-                print(phone.completeNumber);
+                try {
+                  debugPrint("Phone number entered: ${phone.completeNumber}");
+                  signupController.phonenumber.text= phone.completeNumber;
+                  debugPrint("Phone number text: ${signupController.phonenumber.text}");
+                } catch (e) {
+                  debugPrint("Error processing phone number: $e");
+                }
               },
             ),
           ),
@@ -112,7 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   text: 'Login',
                   textColor: AppColors.primary,
                   onPressed:(){
-                    signupController.sendOTP(signupController.phonenumber.text);
+                    // Get.to(OtpAuthenticationView(verificationId: 'verificationId', docId: 'docId'));
+                signupController.sendOTP(signupController.phonenumber.text);
                   },
 
                   backgroundColor:

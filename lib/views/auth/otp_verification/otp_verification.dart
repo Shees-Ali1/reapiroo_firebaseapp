@@ -8,6 +8,7 @@ import '../../../const/color.dart';
 import '../../../const/text_styles.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/otp_backbutton.dart';
+import '../../bottom_nav/bottom_nav.dart';
 import '../signup_view/role_screen.dart';
 
 class OtpAuthenticationView extends StatefulWidget {
@@ -30,6 +31,7 @@ class _OtpAuthenticationViewState extends State<OtpAuthenticationView> {
 
   @override
   Widget build(BuildContext context) {
+    print("widget.verificationId${widget.verificationId}");
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
@@ -76,7 +78,7 @@ class _OtpAuthenticationViewState extends State<OtpAuthenticationView> {
                           fontWeight: FontWeight.w500,
                           fontSize: 22.sp),
                       appContext: context,
-                      length: 5,
+                      length: 6,
                       keyboardType: TextInputType.number,
                       animationType: AnimationType.scale,
                       controller: controller,
@@ -88,8 +90,8 @@ class _OtpAuthenticationViewState extends State<OtpAuthenticationView> {
                           activeColor: AppColors.secondary,
                           selectedColor: AppColors.secondary,
                           inactiveColor: AppColors.secondary.withOpacity(0.5),
-                          fieldHeight: 53.h,
-                          fieldWidth: 53.w),
+                          fieldHeight: 45.h,
+                          fieldWidth: 45.w),
                     ),
                     SizedBox(
                       height: 72.h,
@@ -98,14 +100,16 @@ class _OtpAuthenticationViewState extends State<OtpAuthenticationView> {
                       text: 'Continue',
                       textColor: AppColors.primary,
                       onPressed: () {
-                        Navigator.push(
+                        Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return RoleScreen(); // Replace with your desired screen/widget
+                              return AppNavBar(); // Replace with your desired screen/widget
                             },
                           ),
+                              (Route<dynamic> route) => false, // This removes all previous routes
                         );
+
                       },
                       backgroundColor:
                           AppColors.secondary, // Custom background color
