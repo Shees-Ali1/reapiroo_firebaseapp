@@ -165,9 +165,9 @@ class _CustomerMainHomeState extends State<CustomerMainHome> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
-                        Get.to(CustomerTaskHome(
-                          service: dummy[index]['title'],
-                        ));
+                        // Get.to(CustomerTaskHome(
+                        //   service: dummy[index]['title'],
+                        // ));
                       },
                       child: ServicesContainer(
                         image: dummy[index]["image"],

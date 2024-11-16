@@ -7,12 +7,9 @@ import '../../../../controllers/tech_controller.dart';
 import '../../../../widgets/custom_button.dart';
 import '../../../../widgets/custom_input_fields.dart';
 import '../../../../widgets/drop_down_widget.dart';
-import '../../otp_verification/otp_verification.dart';
 
 class PersonalDetailsForm extends StatefulWidget {
-  const PersonalDetailsForm({
-    Key? key,
-  }) : super(key: key);
+  const PersonalDetailsForm({Key? key}) : super(key: key);
 
   @override
   State<PersonalDetailsForm> createState() => _PersonalDetailsFormState();
@@ -22,11 +19,12 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
   final TextEditingController firstname = TextEditingController();
   final TextEditingController lastname = TextEditingController();
   final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
   final TechController techController = Get.find();
+  String? selectedGender;
 
   @override
   Widget build(BuildContext context) {
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,24 +79,65 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
           ),
           SizedBox(height: 25.h),
 
+          CustomInputField(
+            controller: password,
+            label: 'Your password',
+            prefixIcon: Icon(
+              Icons.lock,
+              color: AppColors.primary,
+              size: 18.sp,
+            ),
+          ),
+          SizedBox(height: 25.h),
           /// Gender Drop Down Field
           GenderDropdownField(
             label: 'Gender',
             iconPath: 'assets/images/gender_icon.png',
             iconHeight: 18.h,
             iconWidth: 18.w,
+            onChanged: (value) {
+              setState(() {
+                selectedGender = value;
+              });
+              print('Gender selected: $selectedGender'); // Debug output
+            },
           ),
+
+
           SizedBox(height: 120.h),
 
           CustomElevatedButton(
             text: 'Next',
             textColor: AppColors.secondary,
             onPressed: () {
-              // Button action
-              techController.selectedIndex.value = "1";
+              print('First Name: ${firstname.text}');
+              print('Last Name: ${lastname.text}');
+              print('Email: ${email.text}');
+              print('Password: ${password.text}');
+              print('Selected Gender: ${techController.selectedGender.value}');
+
+              if (firstname.text.isNotEmpty &&
+                  lastname.text.isNotEmpty &&
+                  email.text.isNotEmpty &&
+                  techController.selectedGender.value.isNotEmpty) {
+                techController.saveTechUser(
+                  firstName: firstname.text,
+                  lastName: lastname.text,
+                  email: email.text, password: password.text,
+                );
+              } else {
+                Get.snackbar(
+                  'Error',
+                  'Please fill in all fields.',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              }
             },
             backgroundColor: AppColors.primary,
           ),
+
 
         ],
       ),
