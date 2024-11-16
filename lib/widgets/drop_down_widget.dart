@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/get.dart';
-import 'package:repairoo/const/color.dart';
-import 'package:repairoo/const/text_styles.dart';
-import 'package:repairoo/controllers/drop_down_controller.dart';
-
-import '../controllers/signup_controller.dart';
+import '../const/color.dart';
+import '../const/text_styles.dart';
+import '../controllers/tech_controller.dart';
 
 class GenderDropdownField extends StatelessWidget {
   final String label;
   final String iconPath; // String for image path
   final double iconHeight; // Height of the icon
   final double iconWidth; // Width of the icon
-  final GenderController genderController = Get.put(GenderController()); // Inject the controller
-  final SignupController signupController = Get.put(SignupController()); // Inject the controller
+  final void Function(String?)? onChanged;
+  final TechController techController = Get.put(TechController()); // Inject TechController
 
   GenderDropdownField({
     required this.label,
     required this.iconPath,
+    this.onChanged,
     this.iconHeight = 24.0, // Default height
     this.iconWidth = 24.0,  // Default width
   });
@@ -28,15 +28,15 @@ class GenderDropdownField extends StatelessWidget {
       height: 55.h,
       decoration: BoxDecoration(
         color: AppColors.primary,
-        borderRadius: BorderRadius.circular(13.31.r), // Match with the input decoration
+        borderRadius: BorderRadius.circular(13.31.r),
       ),
       child: DropdownButtonFormField<String>(
-        value: signupController.selectedGender.value.isEmpty
+        value: techController.selectedGender.value.isEmpty
             ? null
-            : signupController.selectedGender.value, // Bind the value to the controller's observable
+            : techController.selectedGender.value,
         decoration: InputDecoration(
-          filled: true, // Enable filled background
-          fillColor: AppColors.fill, // Set fill color
+          filled: true,
+          fillColor: AppColors.fill,
           labelText: label,
           labelStyle: TextStyle(
             color: AppColors.primary,
@@ -54,20 +54,20 @@ class GenderDropdownField extends StatelessWidget {
             borderSide: BorderSide(color: Color(0xffE2E2E2), width: 0.95.w),
             borderRadius: BorderRadius.circular(13.31.r),
           ),
-          prefixIcon: Container( // Use Container to control size
+          prefixIcon: Container(
             height: iconHeight,
             width: iconWidth,
-            alignment: Alignment.center, // Center the icon
-            child: ColorFiltered( // Apply color filter to the image
+            alignment: Alignment.center,
+            child: ColorFiltered(
               colorFilter: ColorFilter.mode(
-                AppColors.primary.withOpacity(1), // Set the color for the image
-                BlendMode.srcIn, // Blend mode to apply color
+                AppColors.primary.withOpacity(1),
+                BlendMode.srcIn,
               ),
               child: Image.asset(
-                iconPath, // Use the image asset path
-                height: iconHeight, // Set the height
-                width: iconWidth, // Set the width
-                fit: BoxFit.contain, // Ensure the image fits well
+                iconPath,
+                height: iconHeight,
+                width: iconWidth,
+                fit: BoxFit.contain,
               ),
             ),
           ),
@@ -77,22 +77,18 @@ class GenderDropdownField extends StatelessWidget {
             value: value,
             child: Text(
               value,
-              style: jost400(
-                14.65.sp,
-                AppColors.primary,
-              ), // Set dropdown item text color
+              style: jost400(14.65.sp, AppColors.primary),
             ),
           );
         }).toList(),
         onChanged: (String? newValue) {
-          signupController.updateGender(newValue); // Update the controller on change
+          techController.updateGender(newValue);
         },
-        dropdownColor: AppColors.fill, // Set dropdown background color
-        iconEnabledColor: Colors.black, // Set icon color to black
-        style: TextStyle(color: AppColors.primary), // Set the selected item text color
+        dropdownColor: AppColors.fill,
+        iconEnabledColor: Colors.black,
+        style: TextStyle(color: AppColors.primary),
         icon: Icon(Icons.keyboard_arrow_down_sharp,
-          color: AppColors.primary,size: 28,
-        ), // Default dropdown icon
+            color: AppColors.primary, size: 28),
       ),
     ));
   }
