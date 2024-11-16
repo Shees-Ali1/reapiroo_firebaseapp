@@ -27,6 +27,7 @@ void main() async {
   Get.put(TechHomeController());
   Get.put(HomeController());
   Get.put(ServiceController());
+  Get.put(LocationController());
 
   runApp(const MyApp());
 }

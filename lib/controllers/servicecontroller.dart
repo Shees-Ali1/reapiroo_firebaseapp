@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,6 +17,7 @@ class ServiceController extends GetxController {
   var voiceNoteUrl = Rx<String?>(null); // Observable for voice note URL
   var taskDescription = Rx<String>(""); // Observable for task description
   var uploadSpareParts = Rx<bool>(false); // Observable for spare parts upload status
+  var location = ''.obs;  // Use '.obs' to make it reactive
 
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder(); // Initialize FlutterSoundRecorder
   bool _isRecording = false;
@@ -42,53 +45,74 @@ class ServiceController extends GetxController {
   }
 
   // Pick date and time
-  Future<void> _pickDateTime() async {
-    DateTime? selectedDate = await showDatePicker(
-      context: Get.context!,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-
-    if (selectedDate != null) {
-      TimeOfDay? selectedTime = await showTimePicker(
-        context: Get.context!,
-        initialTime: TimeOfDay.fromDateTime(DateTime.now()),
-      );
-
-      if (selectedTime != null) {
-        dateTime.value = DateTime(selectedDate.year, selectedDate.month, selectedDate.day,
-            selectedTime.hour, selectedTime.minute);
-      }
-    }
-  }
 
   // Save the data to Firestore dynamically based on the title
   // Modify saveDataToCollection to match the expected usage
   Future<bool> saveDataToCollection({
     required String title,
-    required File? imageFile,  // Direct parameter for imageFile
+    required File? imageFile, // Direct parameter for imageFile
+    DateTime? selectedDateTime, // DateTime parameter, now nullable
   }) async {
     try {
+      // Generate a 4-digit random ID
+      String randomId = _generateRandomId();
+
+      // Handle DateTime (use current time if null)
+      DateTime dateToSave = selectedDateTime ?? DateTime.now();
+
       // Create a new map of the data to be saved
       Map<String, dynamic> data = {
         "taskDescription": taskDescription.value,
-        "timestamp": FieldValue.serverTimestamp(),
-        "imageUrl": imageFile != null ? await _uploadImage(imageFile, title) : null,
-        "secondImageUrl": null,  // You can add second image logic here if needed
-        "dateTime": dateTime.value,
+        "imageUrl": imageFile != null
+            ? await _uploadImage(imageFile, title)
+            : null, // Upload image if available
+        "secondImageUrl": null,
+        "dateTime": Timestamp.fromDate(dateToSave), // Save dateTime as Firestore Timestamp
         "voiceNoteUrl": voiceNoteUrl.value,
         "uploadSpareParts": uploadSpareParts.value,
+        "location": Get.find<LocationController>().location.value, // Use location.value here
+        "randomId": randomId,
+        "selectedDateTime": dateToSave.toIso8601String(), // Store the selected date-time as ISO string
       };
 
-      // Save data in Firestore
-      await FirebaseFirestore.instance.collection(title).add(data);
+      // Get the current user's UID
+      String userUid = FirebaseAuth.instance.currentUser!.uid;
+
+      // Reference to the document for the current user in the collection `title`
+      DocumentReference userDocRef = FirebaseFirestore.instance
+          .collection(title)
+          .doc(userUid);
+
+      // Check if the document exists
+      DocumentSnapshot docSnapshot = await userDocRef.get();
+
+      if (!docSnapshot.exists) {
+        // If the document doesn't exist, create it
+        await userDocRef.set({
+          'userData': [data],
+        });
+      } else {
+        // If the document exists, update the userData array
+        await userDocRef.update({
+          'userData': FieldValue.arrayUnion([data]),
+        });
+      }
+
+      // Show success message
       Get.snackbar("Success", "Data saved successfully.");
       return true;
     } catch (e) {
+      // Show error message in case of failure
       Get.snackbar("Error", "Failed to save data: $e");
       return false;
     }
+  }
+
+
+// Method to generate a 4-digit random ID
+  String _generateRandomId() {
+    final random = Random();
+    return (1000 + random.nextInt(9000)).toString();  // Generates a 4-digit number
   }
 
 
@@ -163,9 +187,20 @@ class ServiceController extends GetxController {
     }
   }
 
+
   // Get the path to store the recording
   Future<String> _getRecordingPath() async {
     final directory = await getApplicationDocumentsDirectory();
     return '${directory.path}/audio_recording.aac';
+  }
+}
+
+class LocationController extends GetxController {
+  // Observable variable for the location
+  var location = ''.obs;
+
+  // Method to update the location value
+  void updateLocation(String newLocation) {
+    location.value = newLocation;
   }
 }

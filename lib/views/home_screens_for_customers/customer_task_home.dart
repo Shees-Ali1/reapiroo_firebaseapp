@@ -40,6 +40,7 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
   bool _isRecording = false;
   double _progressValue = 0.0; // Value from 0.0 to 1.0
   Timer? _progressTimer;
+  RxString location = ''.obs;  // To capture location input
 
   XFile? imageFile;
 
@@ -328,7 +329,7 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                       ],
                     ),
                   ),
-                Container(
+                  Container(
                     height: 55.h,
                     margin: EdgeInsets.only(bottom: 6.h),
                     width: double.infinity,
@@ -344,27 +345,43 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                         Text("Select location"),
                         Container(
                           height: 30.h,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 5.w, vertical: 6.h),
-                          decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(8.w)),
-                          alignment: Alignment.center,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(AppImages.location_icon,
-                                  height: 15.h, width: 15.w),
-                              SizedBox(
-                                width: 9.w,
+                          width: 100.w,  // Adjust width to fit text input and button
+                          child:
+                            TextField(
+                            onChanged: (value) {
+                              // Update the location value in the controller
+                              Get.find<LocationController>().updateLocation(value);
+                            },
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 15.w, bottom: 0.h),
+                              hintText: 'Enter Location',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.w),
+                                borderSide: BorderSide(color: Color(0xffE2E2E2), width: 1),
                               ),
-                              Text(
-                                "Select on Maps",
-                                style: sora600(10.sp, AppColors.secondary),
-                              )
-                            ],
-                          ),
-                        )
+                            ),
+
+                            )
+
+
+                        ),
+                        // Container(
+                        //   height: 30.h,
+                        //   padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
+                        //   decoration: BoxDecoration(
+                        //       color: AppColors.primary,
+                        //       borderRadius: BorderRadius.circular(8.w)),
+                        //   alignment: Alignment.center,
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.center,
+                        //     children: [
+                        //       Image.asset(AppImages.location_icon,
+                        //           height: 15.h, width: 15.w),
+                        //       SizedBox(width: 9.w),
+                        //       Text("Select on Maps", style: sora600(10.sp, AppColors.secondary)),
+                        //     ],
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
