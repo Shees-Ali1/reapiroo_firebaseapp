@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:repairoo/controllers/audio_controller.dart';
 import 'package:repairoo/controllers/home_controller.dart';
+import 'package:repairoo/controllers/servicecontroller.dart';
 import 'package:repairoo/controllers/user_controller.dart';
 import 'package:repairoo/views/auth/signup_view/role_screen.dart';
 import 'package:repairoo/views/splash_screen/splash_screen.dart';
@@ -25,6 +26,7 @@ void main() async {
   Get.put(AudioController());
   Get.put(TechHomeController());
   Get.put(HomeController());
+  Get.put(ServiceController());
 
   runApp(const MyApp());
 }

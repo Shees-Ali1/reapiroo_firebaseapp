@@ -20,6 +20,8 @@ import 'package:repairoo/widgets/custom_button.dart';
 import 'package:repairoo/widgets/custom_input_fields.dart';
 import 'package:repairoo/widgets/my_svg.dart';
 
+import '../../controllers/servicecontroller.dart';
+
 class CustomerTaskHome extends StatefulWidget {
   const CustomerTaskHome({super.key, this.service});
 
@@ -31,7 +33,7 @@ class CustomerTaskHome extends StatefulWidget {
 
 class _CustomerTaskHomeState extends State<CustomerTaskHome> {
   final HomeController customerVM = Get.find<HomeController>();
-
+  final ServiceController serviceController = Get.find<ServiceController>();
   final TextEditingController task = TextEditingController();
   FlutterSoundRecorder? _recorder;
   File? _audioFile;
@@ -208,99 +210,6 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
     super.dispose();
   }
 
-//   Future<void> _selectTime(BuildContext context, bool isCheckIn) async {
-//     TimeOfDay? pickedTime = await showTimePicker(
-//       context: context,
-//       initialTime: TimeOfDay.now(),
-//       builder: (BuildContext context, Widget? child) {
-//         return Theme(
-//           data: ThemeData.dark().copyWith(
-//             primaryColor: Colors.black, // Background color
-//             colorScheme: ColorScheme.light(
-//               primary: Colors.black,
-//               onPrimary: Colors.white, // Time color
-//               secondary: Colors.black, // AM/PM color
-//               onSecondary: Colors.white, // Button text color
-//             ),
-//             buttonTheme: ButtonThemeData(
-//               textTheme: ButtonTextTheme.normal, // Button text color
-//             ),
-//           ),
-//           child: child!,
-//         );
-//       },
-//     );
-//
-//     if (pickedTime != null) {
-//       DateTime now = DateTime.now();
-//       DateTime finalDateTime = DateTime(
-//         now.year,
-//         now.month,
-//         now.day,
-//         pickedTime.hour,
-//         pickedTime.minute,
-//       );
-//
-//       // If valid, update the corresponding check-in or check-out time
-//       setState(() {
-//         String formattedTime =
-//             '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}';
-//         // Perform your operations with formattedTime here
-//       });
-//     }
-//   }
-//
-// // To open calendar at the top, you can create a custom date picker if necessary
-//   Future<void> _selectDate(BuildContext context) async {
-//     DateTime? pickedDate = await showDatePicker(
-//       context: context,
-//       initialDate: DateTime.now(),
-//       firstDate: DateTime(2000),
-//       lastDate: DateTime(2101),
-//       builder: (BuildContext context, Widget? child) {
-//         return Theme(
-//           data: ThemeData.dark().copyWith(
-//             primaryColor: Colors.black,
-//             colorScheme: ColorScheme.dark(
-//               primary: Colors.black,
-//               onPrimary: Colors.white,
-//               secondary: Colors.white,
-//               onSecondary: Colors.white,
-//             ),
-//           ),
-//           child: child!,
-//         );
-//       },
-//     );
-//
-//     if (pickedDate != null) {
-//       // Handle the selected date here
-//       setState(() {
-//         // Update your state with the selected date
-//       });
-//     }
-//   }
-
-  Future<void> _openGallery() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        imageFile = pickedFile; // Store the image path
-      });
-    } else {
-      // Handle the case when no image was selected
-      print('No image selected.');
-    }
-  }
-
-  // Method to remove the selected image
-  void _removeImage() {
-    setState(() {
-      imageFile  = null; // Clear the image path
-    });
-  }
 
 
   @override
@@ -326,7 +235,8 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
               child: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 13.5.w),
-              child: Column(
+              child:
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
@@ -344,8 +254,8 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
                     decoration: BoxDecoration(
-                      color: Color(0xffFAFAFA),
-                      border: Border.all(color: Color(0xffE2E2E2), width: 1),
+                      color: const Color(0xffFAFAFA),
+                      border: Border.all(color: const Color(0xffE2E2E2), width: 1),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Column(
@@ -354,69 +264,71 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text("Upload Picture/Video"),
-                            imageFile == null ?
-                            InkWell(
-                              onTap: _openGallery,
-                              child: Container(
-                                height: 30.h,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 5.w, vertical: 6.h),
-                                decoration: BoxDecoration(
-                                    color: AppColors.primary,
-                                    borderRadius: BorderRadius.circular(8.w)),
-                                alignment: Alignment.center,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(AppImages.upload,
-                                        height: 18.h, width: 18.w),
-                                    SizedBox(
-                                      width: 8.w,
-                                    ),
-                                    Text(
-                                      "Upload    ",
-                                      style: sora600(10.sp, AppColors.secondary),
-                                    )
-                                  ],
+                            Obx(() {
+                              final imageFile = serviceController.imageFile.value;
+                              return imageFile == null
+                                  ? InkWell(
+                                onTap: serviceController.pickImageFromGallery,
+                                child: Container(
+                                  height: 30.h,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 5.w, vertical: 6.h),
+                                  decoration: BoxDecoration(
+                                      color: AppColors.primary,
+                                      borderRadius:
+                                      BorderRadius.circular(8.w)),
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(AppImages.upload,
+                                          height: 18.h, width: 18.w),
+                                      SizedBox(
+                                        width: 8.w,
+                                      ),
+                                      Text(
+                                        "Upload    ",
+                                        style:
+                                        sora600(10.sp, AppColors.secondary),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ) : GestureDetector(
-                              onTap: () => _removeImage(),
-                              child: Icon(Icons.close, color: Colors.red),
-                            )
+                              )
+                                  : GestureDetector(
+                                onTap: serviceController.removeImage,
+                                child: Icon(Icons.close, color: Colors.red),
+                              );
+                            }),
                           ],
                         ),
-                        if(imageFile != null)
-                          Container(
-                            margin: EdgeInsets.only(top: 15.h,),
+                        Obx(() {
+                          final imageFile = serviceController.imageFile.value;
+                          return imageFile != null
+                              ? Container(
+                            margin: EdgeInsets.only(top: 15.h),
                             height: 100.h,
                             width: 100.w,
                             decoration: BoxDecoration(
-                              image: imageFile != null
-                                  ? DecorationImage(
-                                image: FileImage(
-                                    File(imageFile!.path)),
+                              image: DecorationImage(
+                                image: FileImage(imageFile),
                                 fit: BoxFit.cover,
-                              )
-                                  : null, // No image when the path is null
-                              borderRadius: BorderRadius.circular(8
-                                  .r), // Optional: add border radius if needed
-                            ),
-                            child: imageFile != null
-                                ? Center(
-                              child: Text(
-                                'No Image Selected',
-                                style:
-                                jost400(12.sp, Color(0xff6B7280)),
-                                textAlign: TextAlign.center,
                               ),
-                            )
-                                : null, // Do not display anything if an image is set
-                          ),
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                          )
+                              : Center(
+                            child: Text(
+                              'No Image Selected',
+                              style: jost400(12.sp, const Color(0xff6B7280)),
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        }),
                       ],
                     ),
                   ),
-                  Container(
+                Container(
                     height: 55.h,
                     margin: EdgeInsets.only(bottom: 6.h),
                     width: double.infinity,
@@ -469,20 +381,19 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text( getFormattedDateTime(), // Display formatted date and time
-                         ),
+                        Text(getFormattedDateTime()), // Display formatted date and time
                         Row(
                           children: [
                             GestureDetector(
-                              onTap: () => _pickDateTime(),
+                              onTap: _pickDateTime,
                               child: Container(
                                 width: 73.w,
                                 height: 30.h,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 5.w, vertical: 6.h),
+                                padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
                                 decoration: BoxDecoration(
-                                    color: AppColors.primary,
-                                    borderRadius: BorderRadius.circular(8.w)),
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(8.w),
+                                ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   "Now",
@@ -494,73 +405,25 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                               width: 73.w,
                               height: 30.h,
                               margin: EdgeInsets.only(left: 8.w),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 5.w, vertical: 6.h),
+                              padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
                               decoration: BoxDecoration(
-                                  color: AppColors.buttonGrey,
-                                  borderRadius: BorderRadius.circular(8.w)),
+                                color: AppColors.buttonGrey,
+                                borderRadius: BorderRadius.circular(8.w),
+                              ),
                               alignment: Alignment.center,
                               child: Text(
                                 "Later",
                                 style: sora600(10.sp, AppColors.secondary),
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ],
                     ),
                   ),
-                  Container(
-                    height: 55.h,
-                    margin: EdgeInsets.only(bottom: 6.h),
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 15.w),
-                    decoration: BoxDecoration(
-                      color: Color(0xffFAFAFA),
-                      border: Border.all(color: Color(0xffE2E2E2), width: 1),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Record Voice Note"),
-                        InkWell(
-                          onTap: () async {
-                            if (_isRecording) {
-                              await _stopRecording();
-                            } else {
-                              await _startRecording();
-                            }
-                          },
-                          child: Center(
-                            child: CircularPercentIndicator(
-                              radius: 20.0, // Radius of the circular indicator
-                              lineWidth:
-                                  4.w, // Thickness of the circular indicator
-                              percent:
-                                  _progressValue, // Progress percentage from 0 to 1
-                              animation: true,
-                              animateFromLastPercent: true,
-                              circularStrokeCap: CircularStrokeCap.round,
-                              progressColor: Colors
-                                  .grey, // Color that fills up as recording progresses
-                              backgroundColor:
-                                  Colors.black, // Initial color of the indicator
-                              center: CircleAvatar(
-                                radius: 10.w,
-                                backgroundColor: _isRecording ? Colors.red : AppColors.primary,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                   Obx(
-                    () => Container(
-                      height: customerVM.uploadSpareParts.value == true
-                          ? 130.h
-                          : 55.h,
+                        () => Container(
+                      height: customerVM.uploadSpareParts.value ? 130.h : 55.h,
                       margin: EdgeInsets.only(bottom: 6.h),
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(horizontal: 15.w),
@@ -586,17 +449,15 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                                     child: Container(
                                       width: 52.w,
                                       height: 30.h,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 5.w, vertical: 6.h),
+                                      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
                                       decoration: BoxDecoration(
-                                          color: AppColors.buttonGrey,
-                                          borderRadius:
-                                              BorderRadius.circular(8.w)),
+                                        color: AppColors.buttonGrey,
+                                        borderRadius: BorderRadius.circular(8.w),
+                                      ),
                                       alignment: Alignment.center,
                                       child: Text(
                                         "Yes",
-                                        style:
-                                            sora600(10.sp, AppColors.secondary),
+                                        style: sora600(10.sp, AppColors.secondary),
                                       ),
                                     ),
                                   ),
@@ -608,17 +469,15 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                                       width: 52.w,
                                       height: 30.h,
                                       margin: EdgeInsets.only(left: 8.w),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 5.w, vertical: 6.h),
+                                      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
                                       decoration: BoxDecoration(
-                                          color: AppColors.primary,
-                                          borderRadius:
-                                              BorderRadius.circular(8.w)),
+                                        color: AppColors.primary,
+                                        borderRadius: BorderRadius.circular(8.w),
+                                      ),
                                       alignment: Alignment.center,
                                       child: Text(
                                         "No",
-                                        style:
-                                            sora600(10.sp, AppColors.secondary),
+                                        style: sora600(10.sp, AppColors.secondary),
                                       ),
                                     ),
                                   ),
@@ -626,64 +485,57 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                               ),
                             ],
                           ),
-                          if (customerVM.uploadSpareParts.value == true)
-                            SizedBox(
-                              height: 17.h,
-                            ),
-                          if (customerVM.uploadSpareParts.value == true)
+                          if (customerVM.uploadSpareParts.value) ...[
+                            SizedBox(height: 17.h),
                             Column(
                               children: [
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text("Upload Picture/Video"),
                                     Container(
                                       height: 30.h,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 5.w, vertical: 6.h),
+                                      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
                                       decoration: BoxDecoration(
-                                          color: AppColors.primary,
-                                          borderRadius:
-                                              BorderRadius.circular(8.w)),
+                                        color: AppColors.primary,
+                                        borderRadius: BorderRadius.circular(8.w),
+                                      ),
                                       alignment: Alignment.center,
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Image.asset(AppImages.upload,
-                                              height: 18.h, width: 18.w),
-                                          SizedBox(
-                                            width: 8.w,
-                                          ),
+                                          Image.asset(AppImages.upload, height: 18.h, width: 18.w),
+                                          SizedBox(width: 8.w),
                                           Text(
                                             "Upload    ",
-                                            style: sora600(
-                                                10.sp, AppColors.secondary),
-                                          )
+                                            style: sora600(10.sp, AppColors.secondary),
+                                          ),
                                         ],
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
-                                SizedBox(
-                                  height: 5.h,
-                                ),
+                                SizedBox(height: 5.h),
                                 Text(
                                   "Spare Parts cost is NOT included in the offers, as technician will attach a proof of invoice for you to pay after he buys it",
                                   style: jost400(10.sp, Color(0xff4B4B4B)),
                                 ),
                               ],
                             ),
+                          ],
                         ],
                       ),
                     ),
                   ),
+
+                  // Custom Input Field (Task Description)
                   CustomInputField(
                     maxLines: 4,
                     controller: task,
                     hintText: 'Describe your task',
-
+                    onChanged: (value) {
+                      serviceController.taskDescription.value = value; // Update observable
+                    },
                   ),
                   SizedBox(
                     height: 72.h,
@@ -692,8 +544,34 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                     padding: EdgeInsets.symmetric(horizontal: 12.0.w),
                     child: CustomElevatedButton(
                       text: "Next",
-                      onPressed: () {
-                        Get.to(SearchOfferScreen(field: widget.service!));
+                      onPressed: () async {
+                        // Ensure an image is selected before attempting to save
+                        if (serviceController.imageFile.value == null) {
+                          Get.snackbar(
+                            "Error",
+                            "Please select an image before proceeding.",
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          return;
+                        }
+
+                        // Save data before navigating
+                        final isSuccess = await serviceController.saveDataToCollection(
+                          title: widget.service!,  // Title being passed to saveDataToCollection
+                          imageFile: serviceController.imageFile.value, // Pass the imageFile here
+                        );
+
+                        if (isSuccess) {
+                          // Navigate to the next screen if save is successful
+                          Get.to(SearchOfferScreen(field: widget.service!));
+                        } else {
+                          // Show an error if save failed
+                          Get.snackbar(
+                            "Error",
+                            "Failed to save data. Please try again.",
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        }
                       },
                       fontSize: 19.sp,
                     ),
