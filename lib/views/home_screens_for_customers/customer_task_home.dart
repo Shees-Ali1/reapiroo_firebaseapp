@@ -560,31 +560,28 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Record Voice Note                ',
-                          style: jost400(14.sp, Colors.black), // Assuming jost400 is your custom text style
+                          'Record Voice Note',
+                          style: TextStyle(fontSize: 14.sp, color: Colors.black),
                         ),
-                        _isRecording
-                            ? IconButton(
-                          icon: Icon(Icons.stop),
-                          onPressed: _stopRecording,
-                          color: Colors.red,
-                        )
-                            : IconButton(
-                          icon: Icon(Icons.mic),
-                          onPressed: _startRecording,
-                          color: Colors.black,
-                        ),
-                        // Optional progress indicator
-                        _isRecording
+                        Obx(() => IconButton(
+                          icon: Icon(
+                            serviceController.isRecording.value ? Icons.stop : Icons.mic,
+                          ),
+                          onPressed: serviceController.isRecording.value
+                              ? serviceController.stopRecording
+                              : serviceController.recordVoiceNote,
+                          color: serviceController.isRecording.value ? Colors.red : Colors.black,
+                        )),
+                        Obx(() => serviceController.isRecording.value
                             ? CircularProgressIndicator(
-                          value: _progressValue,
+                          value: serviceController.progressValue.value,
                           strokeWidth: 2,
                         )
-                            : Container(),
+                            : Container()),
                       ],
                     ),
                   ),
-                  CustomInputField(
+            CustomInputField(
                     maxLines: 4,
                     controller: task,
                     hintText: 'Describe your task',

@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,9 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:repairoo/views/auth/login_view/login_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-import '../views/auth/otp_verification/otp_verification.dart';
+import 'package:repairoo/views/auth/otp_verification/otp_verification.dart';
 
 class SignupController extends GetxController {
   RxBool isLoading = false.obs;
@@ -19,6 +15,7 @@ class SignupController extends GetxController {
   var selectedGender = ''.obs;
 
   RxString VerificationId = ''.obs;
+
   void updateGender(String? gender) {
     selectedGender.value = gender ?? ''; // Update the selected gender
   }
@@ -29,11 +26,11 @@ class SignupController extends GetxController {
   final TextEditingController name = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController phonenumber = TextEditingController();
+  final TextEditingController password = TextEditingController();
 
   var imageFile = Rxn<File>(); // Declare as Rxn<File>() for reactivity
 
   var uploadedImageUrl = ''.obs; // Store the uploaded image URL
-  // var isLoading = false.obs; // Track loading state
 
   void pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -43,6 +40,7 @@ class SignupController extends GetxController {
       imageFile.value = File(pickedFile.path); // Update reactively
     }
   }
+
   Future<bool> loginWithEmailPassword(String email, String password) async {
     try {
       // Your login logic here
@@ -59,6 +57,7 @@ class SignupController extends GetxController {
       return false; // Login failed
     }
   }
+
   // Function to upload image to Firebase Storage and get the URL
   Future<void> uploadImage(String userId) async {
     if (imageFile.value == null) return; // Exit if no image selected
@@ -84,44 +83,21 @@ class SignupController extends GetxController {
     }
   }
 
-  // Future<void> uploadImage(XFile imageFile) async {
-  //   try {
-  //     // Check if user is authenticated
-  //     // User? user = FirebaseAuth.instance.currentUser;
-  //     // if (user == null) {
-  //     //   Get.snackbar("Error", "User is not authenticated.");
-  //     //   return;
-  //     // }
-  //
-  //     // Create a reference to the Firebase Storage location
-  //     String fileName = '${DateTime.now().millisecondsSinceEpoch}_${imageFile.name}';
-  //     Reference storageReference = FirebaseStorage.instance
-  //         .ref()
-  //         .child('profile_images')
-  //         .child(fileName);
-  //
-  //     // Convert XFile to File and upload
-  //     File fileToUpload = File(imageFile.path);
-  //     UploadTask uploadTask = storageReference.putFile(fileToUpload);
-  //     TaskSnapshot taskSnapshot = await uploadTask;
-  //
-  //     // Get the download URL of the uploaded image
-  //     String imageUrl = await taskSnapshot.ref.getDownloadURL();
-  //     // Optionally: Use the imageUrl as needed
-  //   } catch (e) {
-  //     Get.snackbar("Error", "Image upload failed: $e");
-  //   }
-  // }
-
   Future<void> signup() async {
     try {
       isLoading.value = true;
 
-      // Step 1: Firebase Authentication - Sign in with phone number
+      // Step 1: Firebase Authentication - Sign in with email and password
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email.text, password: phonenumber.text);
+          email: email.text, password: password.text);
+
+      // Step 2: Upload user data
       await saveUserData(FirebaseAuth.instance.currentUser!.uid);
+
+      // Step 3: Navigate to login screen
       Get.offAll(LoginScreen());
+
+      // Clear text fields
       name.clear();
       email.clear();
       phonenumber.clear();
@@ -201,13 +177,12 @@ class SignupController extends GetxController {
     }
   }
 
-
-
   Future<void> saveUserData(String uid) async {
     await _firestore.collection('userDetails').doc(uid).set({
       'userId': uid,
       'userName': name.text,
       'userEmail': email.text,
+      'password': password.text,
       'gender': selectedGender.value,
       'phoneNumber': phonenumber.text,
       'image': uploadedImageUrl.value.isNotEmpty ? uploadedImageUrl.value : '',
@@ -220,6 +195,5 @@ class SignupController extends GetxController {
     name.clear();
     email.clear();
     phonenumber.clear();
-    // uploadedImageUrl.value='';
   }
 }

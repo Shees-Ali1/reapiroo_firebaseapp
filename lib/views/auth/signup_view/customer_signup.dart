@@ -32,6 +32,8 @@ class _CustomerSignupState extends State<CustomerSignup> {
     super.initState();
     signupController.phonenumber.clear();
     signupController.email.clear();
+    signupController.password.clear();
+
     signupController.name.clear();
     signupController.selectedGender.value ='';
     // signupController.imageFile?.clear();
@@ -224,6 +226,21 @@ class _CustomerSignupState extends State<CustomerSignup> {
                       debugPrint("Error processing phone number: $e");
                     }
                   },
+                ),
+              ),
+              SizedBox(height: 16.h),
+
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: CustomInputField(
+                  label: 'Password',
+                  controller: signupController.password,
+                  obscureText: true, // Hide the password text
+                  prefixIcon: Icon(
+                    Icons.lock,
+                    color: AppColors.primary,
+                    size: 18.sp,
+                  ), // Add prefix icon here
                 ),
               ),
               SizedBox(height: 16.h),
