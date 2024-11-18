@@ -29,6 +29,29 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
   List<String?> selectedImagePaths = List.filled(3, null);
   final TechController techController = Get.find();
+  void _onNextPressed() {
+    // Validate required documents
+    if (selectedImagePaths[0] == null || selectedImagePaths[1] == null) {
+      Get.snackbar(
+        'Missing Documents',
+        'Please upload Profile Picture and Emirates ID.',
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+      );
+      return;
+    }
+
+    // Save documents to the controller
+    techController.updateDocuments(selectedImagePaths);
+
+    // Save user data and navigate to Pending Approval screen
+    techController.saveTechUser().then((_) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PendingApproval()),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,22 +180,4 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     });
   }
 
-  void _onNextPressed() {
-    if (selectedImagePaths[0] == null || selectedImagePaths[1] == null) {
-      // Display error message if the first two documents are not uploaded
-      Get.snackbar(
-        'Missing Documents',
-        'Please upload Profile Picture and Emirates ID.',
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PendingApproval(),
-        ),
-      );
-    }
-  }
 }

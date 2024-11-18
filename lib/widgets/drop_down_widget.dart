@@ -8,18 +8,18 @@ import '../controllers/tech_controller.dart';
 
 class GenderDropdownField extends StatelessWidget {
   final String label;
-  final String iconPath; // String for image path
-  final double iconHeight; // Height of the icon
-  final double iconWidth; // Width of the icon
+  final String iconPath;
+  final double iconHeight;
+  final double iconWidth;
   final void Function(String?)? onChanged;
-  final TechController techController = Get.put(TechController()); // Inject TechController
+  final TechController techController = Get.find(); // Use Get.find() to ensure the same instance
 
   GenderDropdownField({
     required this.label,
     required this.iconPath,
     this.onChanged,
-    this.iconHeight = 24.0, // Default height
-    this.iconWidth = 24.0,  // Default width
+    this.iconHeight = 24.0,
+    this.iconWidth = 24.0,
   });
 
   @override
@@ -82,7 +82,12 @@ class GenderDropdownField extends StatelessWidget {
           );
         }).toList(),
         onChanged: (String? newValue) {
-          techController.updateGender(newValue);
+          if (newValue != null) {
+            techController.updateGender(newValue); // Update controller
+          }
+          if (onChanged != null) {
+            onChanged!(newValue); // Trigger any additional behavior
+          }
         },
         dropdownColor: AppColors.fill,
         iconEnabledColor: Colors.black,

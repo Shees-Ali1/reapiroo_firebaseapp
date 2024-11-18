@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -40,6 +42,7 @@ class _TaskDescriptionHomeState extends State<TaskDescriptionHome> {
   final TextEditingController description = TextEditingController();
   final UserController userVM = Get.put(UserController());
   DateTime? selectedDateTime;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<DateTime?> showDateTimePicker({
     required BuildContext context,
@@ -150,9 +153,12 @@ class _TaskDescriptionHomeState extends State<TaskDescriptionHome> {
     if (selectedDateTime == null) return "Select Date & Time";
     return DateFormat('MM/dd/yyyy hh:mm a').format(selectedDateTime!);
   }
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
+    final String? currentUserUid = _auth.currentUser?.uid;
+
     return Scaffold(
       backgroundColor: AppColors.secondary,
       appBar: MyAppBar(
@@ -860,115 +866,240 @@ class _TaskDescriptionHomeState extends State<TaskDescriptionHome> {
                 SizedBox(
                   height: 20.h,
                 ),
-                userVM.userRole.value == "Customer"
-                    ? Row(
-                        children: [
-                          // Reschedule Button
-                          CustomElevatedButton(
-                            width: 160.w,
-                            height: 51.h,
-                            text: "Reschedule",
-                            backgroundColor: AppColors.primary,
-                            textColor: AppColors.secondary,
-                            fontSize: 19.sp,
-                            onPressed: () {
-                              // Show message for rescheduling
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  backgroundColor: Colors.white,
-                                  title: FittedBox(
-                                      child: Text("Reschedule Information")),
-                                  content: Text(
-                                      "Please contact the technician for that, you can always contact us for more help."),
-                                  actions: [
-                                    TextButton(
-                                      child: Text("OK",
-                                          style: jost500(
-                                            15.sp,
-                                            AppColors.primary,
-                                          )),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            // enabled: false, // Disable the button
-                          ),
-                          SizedBox(
-                            width: 10.w,
-                          ),
-                          // Cancel Button
-                          CustomElevatedButton(
-                            width: 160.w,
-                            height: 51.h,
-                            text: "Cancel",
-                            backgroundColor: AppColors.buttonGrey,
-                            textColor: AppColors.primary,
-                            borderSide:
-                                BorderSide(width: 0, color: Colors.transparent),
-                            fontSize: 19.sp,
-                            onPressed: () {
-                              // Show message for canceling
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  backgroundColor: Colors.white,
-                                  title: Text("Cancel Information"),
-                                  content: Text(
-                                      "Cancelling the order is not allowed, please contact us for help."),
-                                  actions: [
-                                    TextButton(
-                                      child: Text("OK",
-                                          style: jost500(
-                                            15.sp,
-                                            AppColors.primary,
-                                          )),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            // enabled: false, // Disable the button
-                          ),
-                        ],
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomElevatedButton(
-                            width: 160.w,
-                            height: 51.h,
-                            text: "Mark as done",
-                            backgroundColor: AppColors.primary,
-                            textColor: AppColors.secondary,
-                            fontSize: 19.sp,
-                            onPressed: () {
-                              //Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> NewTaskHome()));
-                              Get.off(NewTaskHome());
-                            },
-                          ),
-                          CustomElevatedButton(
-                            width: 160.w,
-                            height: 51.h,
-                            text: "Cancel",
-                            backgroundColor: AppColors.buttonGrey,
-                            textColor: AppColors.primary,
-                            borderSide:
-                                BorderSide(width: 0, color: Colors.transparent),
-                            fontSize: 19.sp,
-                            onPressed: () {
-                              CancelDialogBox();
-                            },
-                          ),
-                        ],
-                      ),
+                // userVM.userRole.value != "Customer"
+                //     ? Row(
+                //         children: [
+                //           // Reschedule Button
+                //           CustomElevatedButton(
+                //             width: 160.w,
+                //             height: 51.h,
+                //             text: "Reschedule",
+                //             backgroundColor: AppColors.primary,
+                //             textColor: AppColors.secondary,
+                //             fontSize: 19.sp,
+                //             onPressed: () {
+                //               // Show message for rescheduling
+                //               showDialog(
+                //                 context: context,
+                //                 builder: (context) => AlertDialog(
+                //                   backgroundColor: Colors.white,
+                //                   title: FittedBox(
+                //                       child: Text("Reschedule Information")),
+                //                   content: Text(
+                //                       "Please contact the technician for that, you can always contact us for more help."),
+                //                   actions: [
+                //                     TextButton(
+                //                       child: Text("OK",
+                //                           style: jost500(
+                //                             15.sp,
+                //                             AppColors.primary,
+                //                           )),
+                //                       onPressed: () {
+                //                         Navigator.of(context).pop();
+                //                       },
+                //                     ),
+                //                   ],
+                //                 ),
+                //               );
+                //             },
+                //             // enabled: false, // Disable the button
+                //           ),
+                //           SizedBox(
+                //             width: 10.w,
+                //           ),
+                //           // Cancel Button
+                //           CustomElevatedButton(
+                //             width: 160.w,
+                //             height: 51.h,
+                //             text: "Cancel",
+                //             backgroundColor: AppColors.buttonGrey,
+                //             textColor: AppColors.primary,
+                //             borderSide:
+                //                 BorderSide(width: 0, color: Colors.transparent),
+                //             fontSize: 19.sp,
+                //             onPressed: () {
+                //               // Show message for canceling
+                //               showDialog(
+                //                 context: context,
+                //                 builder: (context) => AlertDialog(
+                //                   backgroundColor: Colors.white,
+                //                   title: Text("Cancel Information"),
+                //                   content: Text(
+                //                       "Cancelling the order is not allowed, please contact us for help."),
+                //                   actions: [
+                //                     TextButton(
+                //                       child: Text("OK",
+                //                           style: jost500(
+                //                             15.sp,
+                //                             AppColors.primary,
+                //                           )),
+                //                       onPressed: () {
+                //                         Navigator.of(context).pop();
+                //                       },
+                //                     ),
+                //                   ],
+                //                 ),
+                //               );
+                //             },
+                //             // enabled: false, // Disable the button
+                //           ),
+                //         ],
+                //       )
+                //     : Row(
+                //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //         children: [
+                //           CustomElevatedButton(
+                //             width: 160.w,
+                //             height: 51.h,
+                //             text: "Mark as done",
+                //             backgroundColor: AppColors.primary,
+                //             textColor: AppColors.secondary,
+                //             fontSize: 19.sp,
+                //             onPressed: () {
+                //               //Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> NewTaskHome()));
+                //               Get.off(NewTaskHome());
+                //             },
+                //           ),
+                //           CustomElevatedButton(
+                //             width: 160.w,
+                //             height: 51.h,
+                //             text: "Cancel",
+                //             backgroundColor: AppColors.buttonGrey,
+                //             textColor: AppColors.primary,
+                //             borderSide:
+                //                 BorderSide(width: 0, color: Colors.transparent),
+                //             fontSize: 19.sp,
+                //             onPressed: () {
+                //               CancelDialogBox();
+                //             },
+                //           ),
+                //         ],
+                //       ),
+                FutureBuilder<DocumentSnapshot>(
+                  future: _firestore.collection('tech_users').doc(currentUserUid).get(),
+                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error fetching role.'));
+                    }
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return Center(child: Text('User data not found.'));
+                    }
+
+                    // Extract role from Firestore document
+                    String role = snapshot.data!['role'] ?? '';
+
+                    return role == 'Tech'
+                        ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomElevatedButton(
+                          width: 160.w,
+                          height: 51.h,
+                          text: "Mark as done",
+                          backgroundColor: AppColors.primary,
+                          textColor: AppColors.secondary,
+                          fontSize: 19.sp,
+                          onPressed: () {
+                            Get.off(NewTaskHome());
+                          },
+                        ),
+                        CustomElevatedButton(
+                          width: 160.w,
+                          height: 51.h,
+                          text: "Cancel",
+                          backgroundColor: AppColors.buttonGrey,
+                          textColor: AppColors.primary,
+                          borderSide:
+                          BorderSide(width: 0, color: Colors.transparent),
+                          fontSize: 19.sp,
+                          onPressed: () {
+                            CancelDialogBox();
+                          },
+                        ),
+                      ],
+                    )
+                        : Row(
+                      children: [
+                        // Reschedule Button
+                        CustomElevatedButton(
+                          width: 160.w,
+                          height: 51.h,
+                          text: "Reschedule",
+                          backgroundColor: AppColors.primary,
+                          textColor: AppColors.secondary,
+                          fontSize: 19.sp,
+                          onPressed: () {
+                            // Show message for rescheduling
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: Colors.white,
+                                title: FittedBox(
+                                    child: Text("Reschedule Information")),
+                                content: Text(
+                                    "Please contact the technician for that, you can always contact us for more help."),
+                                actions: [
+                                  TextButton(
+                                    child: Text("OK",
+                                        style: jost500(
+                                          15.sp,
+                                          AppColors.primary,
+                                        )),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(
+                          width: 10.w,
+                        ),
+                        // Cancel Button
+                        CustomElevatedButton(
+                          width: 160.w,
+                          height: 51.h,
+                          text: "Cancel",
+                          backgroundColor: AppColors.buttonGrey,
+                          textColor: AppColors.primary,
+                          borderSide:
+                          BorderSide(width: 0, color: Colors.transparent),
+                          fontSize: 19.sp,
+                          onPressed: () {
+                            // Show message for canceling
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: Colors.white,
+                                title: Text("Cancel Information"),
+                                content: Text(
+                                    "Cancelling the order is not allowed, please contact us for help."),
+                                actions: [
+                                  TextButton(
+                                    child: Text("OK",
+                                        style: jost500(
+                                          15.sp,
+                                          AppColors.primary,
+                                        )),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ),
+
                 SizedBox(
                   height: 26.h,
                 ),

@@ -110,30 +110,17 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
             text: 'Next',
             textColor: AppColors.secondary,
             onPressed: () {
-              print('First Name: ${firstname.text}');
-              print('Last Name: ${lastname.text}');
-              print('Email: ${email.text}');
-              print('Password: ${password.text}');
-              print('Selected Gender: ${techController.selectedGender.value}');
+              techController.updateUserDetails(
+                firstname: firstname.text,
+                lastname: lastname.text,
+                email: email.text,
+                password: password.text,
+                gender: selectedGender,
+              );
 
-              if (firstname.text.isNotEmpty &&
-                  lastname.text.isNotEmpty &&
-                  email.text.isNotEmpty &&
-                  techController.selectedGender.value.isNotEmpty) {
-                techController.saveTechUser(
-                  firstName: firstname.text,
-                  lastName: lastname.text,
-                  email: email.text, password: password.text,
-                );
-              } else {
-                Get.snackbar(
-                  'Error',
-                  'Please fill in all fields.',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                );
-              }
+              // Navigate by updating selectedIndex
+              techController.selectedIndex.value = "1";
+
             },
             backgroundColor: AppColors.primary,
           ),

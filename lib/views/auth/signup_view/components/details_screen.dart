@@ -44,8 +44,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
             textColor: AppColors.secondary,
             onPressed: () {
               // Button action
-              techController.selectedIndex.value = "3";
-            },
+              techController.updateBio(description.text);
+
+              // Navigate to the next step
+              techController.selectedIndex.value = "3";            },
             backgroundColor: AppColors.primary,
           ),
         ],

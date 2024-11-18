@@ -108,7 +108,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
           text: 'Next',
           textColor: AppColors.secondary,
           onPressed: () {
-            // Perform actions with selectedServices
+            // Save selected services to the controller
+            techController.updateSelectedServices(selectedServices);
+
+            // Navigate by updating selectedIndex
             techController.selectedIndex.value = "2";
           },
           backgroundColor: AppColors.primary,

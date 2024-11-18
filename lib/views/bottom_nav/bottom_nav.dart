@@ -1,4 +1,6 @@
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -14,6 +16,7 @@ import 'package:repairoo/views/profile_screens/profile_screen.dart';
 import '../../const/images.dart';
 import '../../controllers/nav_bar_controller.dart';
 import '../../widgets/drawer.dart';
+import '../home_screens_for_customers/customer_main_home.dart';
 
 class AppNavBar extends StatefulWidget {
   const AppNavBar({super.key});
@@ -28,8 +31,43 @@ class _AppNavBarState extends State<AppNavBar> {
   final _pageController = PageController(initialPage: 0);
 
   final _controller = NotchBottomBarController(index: 0);
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String userRole = '';
+  bool isLoading = true;
 
   int maxCount = 4;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserRole();
+  }
+
+  Future<void> fetchUserRole() async {
+    try {
+      String uid = _auth.currentUser?.uid ?? '';
+      DocumentSnapshot userDoc = await _firestore.collection('tech_users').doc(uid).get();
+
+      if (userDoc.exists) {
+        setState(() {
+          userRole = userDoc['role'] ?? 'Customer';
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          userRole = 'Customer';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching user role: $e");
+      setState(() {
+        userRole = 'Customer'; // Default to Customer on error
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -47,6 +85,10 @@ class _AppNavBarState extends State<AppNavBar> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     bool isIpad = MediaQuery.of(context).size.width > 600;
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -58,7 +100,7 @@ class _AppNavBarState extends State<AppNavBar> {
 
     // Move bottomBarPages into build method to ensure userVM is accessible
     List<Widget> bottomBarPages = [
-      userVM.userRole.value == "Customer" ? Customerhomescreen() : HomeScreen(),
+      userRole == "Tech" ? HomeScreen() : CustomerMainHome(),
       // if (userVM.userRole.value != "Customer") OrderScreen(),
       const BookingScreenMain(),
       const ChatsScreenMain(),
