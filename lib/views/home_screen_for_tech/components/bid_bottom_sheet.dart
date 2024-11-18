@@ -1,26 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:repairoo/const/color.dart';
 import 'package:repairoo/const/text_styles.dart';
 import 'package:repairoo/widgets/custom_button.dart';
 import 'package:repairoo/widgets/custom_input_fields.dart';
 
-import 'customer_bid.dart';
+class BidBottomSheet extends StatelessWidget {
+  final String userUid;
 
-class CustomerrBidBottomSheet extends StatelessWidget {
-  const CustomerrBidBottomSheet({super.key, required this.comingFrom});
-
-  final String comingFrom;
+  const BidBottomSheet({super.key, required this.userUid});
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController bidController = TextEditingController();
-    final TextEditingController messageController = TextEditingController(); // Controller for the message
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final FirebaseAuth auth = FirebaseAuth.instance;
 
     return Container(
       width: double.infinity,
@@ -37,17 +33,11 @@ class CustomerrBidBottomSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(height: 10.h),
-            Text(
-              "Bid",
-              style: jost600(32.sp, AppColors.primary),
-            ),
+            Text("Bid", style: jost600(32.sp, AppColors.primary)),
             SizedBox(height: 20.h),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                "Enter your bid amount",
-                style: jost600(16.sp, AppColors.primary),
-              ),
+              child: Text("Enter your bid amount", style: jost600(16.sp, AppColors.primary)),
             ),
             SizedBox(height: 15.h),
             CustomInputField(
@@ -55,110 +45,63 @@ class CustomerrBidBottomSheet extends StatelessWidget {
               label: "Your offer",
               keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 15.h),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Add a message (optional)",
-                style: jost600(16.sp, AppColors.primary),
-              ),
-            ),
-            SizedBox(height: 15.h),
-            CustomInputField(
-              controller: messageController,
-              label: "Your message",
-              keyboardType: TextInputType.text,
-            ),
             SizedBox(height: 21.h),
             CustomElevatedButton(
-              text: comingFrom == "customer" ? "Offer" : "Send Bid",
+              text: "Send Bid",
               fontSize: 16.sp,
-                onPressed: () async {
-                  final String bidAmount = bidController.text.trim();
-                  final String message = messageController.text.trim();
+              onPressed: () async {
+                final String bidAmount = bidController.text.trim();
+                final String currentUserUid = FirebaseAuth.instance.currentUser?.uid ?? ""; // Get current user UID
 
-                  // Fetch the current user's UID from FirebaseAuth
-                  final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
+                if (bidAmount.isEmpty) {
+                  Get.snackbar("Error", "Bid amount cannot be empty.");
+                  return;
+                }
 
-                  if (currentUserId == null) {
-                    Get.snackbar("Error", "User not logged in.");
+                try {
+                  // Fetch the current user's first name from Firestore
+                  final DocumentSnapshot userSnapshot = await firestore
+                      .collection('tech_users')
+                      .doc(currentUserUid)
+                      .get();
+
+                  if (!userSnapshot.exists) {
+                    Get.snackbar("Error", "User data not found.");
                     return;
                   }
 
-                  if (bidAmount.isEmpty) {
-                    Get.snackbar("Error", "Bid amount cannot be empty.");
-                    return;
-                  }
+                  final String firstName = userSnapshot['firstName'] ?? "Unknown";
 
-                  try {
-                    // Query the 'tasks' collection where 'userUid' matches the current user's UID
-                    final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-                        .collection('tasks')
-                        .where('userUid', isEqualTo: currentUserId)
-                        .get();
+                  // Locate the Firestore document using userUid
+                  final QuerySnapshot taskSnapshot = await firestore
+                      .collection('tasks')
+                      .where('userUid', isEqualTo: userUid)
+                      .get();
 
-                    if (querySnapshot.docs.isEmpty) {
-                      Get.snackbar("Error", "No tasks found for the current user.");
-                      return;
-                    }
+                  if (taskSnapshot.docs.isNotEmpty) {
+                    final docRef = taskSnapshot.docs.first.reference;
 
-                    String? matchingBidderId;
-
-                    // Loop through the matching documents
-                    for (var doc in querySnapshot.docs) {
-                      final data = doc.data() as Map<String, dynamic>;
-
-                      // Search for bidderId in each key that contains a list
-                      for (var entry in data.entries) {
-                        if (entry.value is List) {
-                          final List<dynamic> bids = entry.value;
-
-                          for (var bid in bids) {
-                            if (bid is Map<String, dynamic> && bid.containsKey('bidderId')) {
-                              matchingBidderId = bid['bidderId'];
-                              break;
-                            }
-                          }
+                    // Add the bid to the relevant task field (e.g., "TV Mounting")
+                    await docRef.update({
+                      'TV Mounting': FieldValue.arrayUnion([
+                        {
+                          'bid': bidAmount,
+                          'bidderId': currentUserUid, // Current user making the bid
+                          'firstName': firstName,    // Include bidder's first name
                         }
-
-                        // Break the loop if a matching bidderId is found
-                        if (matchingBidderId != null) break;
-                      }
-
-                      // Stop if a matching bidderId is found
-                      if (matchingBidderId != null) break;
-                    }
-
-                    if (matchingBidderId == null) {
-                      Get.snackbar("Error", "No bidderId found for the current user.");
-                      return;
-                    }
-
-                    // Add bid to "Bid Notifications" collection
-                    await FirebaseFirestore.instance.collection('Bid Notifications').add({
-                      'bidAmount': bidAmount,
-                      'message': message,
-                      'bidderId': matchingBidderId,
-                      'bidFrom': comingFrom,
-                      'timestamp': FieldValue.serverTimestamp(),
-                      'customerUid': currentUserId,  // Add current user's UID
+                      ]),
                     });
 
                     Get.snackbar("Success", "Bid sent successfully!");
-                    Get.back();
-
-                    if (comingFrom == "tech") {
-                      Get.bottomSheet(
-                        isScrollControlled: true,
-                        isDismissible: true,
-                        enableDrag: true,
-                        const CustomerBidBottomSheet(),
-                      );
-                    }
-                  } catch (e) {
-                    Get.snackbar("Error", "Failed to send bid: $e");
+                    Navigator.of(context).pop();
+                  } else {
+                    Get.snackbar("Error", "Task not found.");
                   }
+                } catch (e) {
+                  Get.snackbar("Error", "Failed to send bid: $e");
                 }
+              },
+
             ),
             SizedBox(height: 29.h),
           ],

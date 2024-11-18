@@ -209,7 +209,7 @@ class BookingCard extends StatelessWidget {
                     /// View Container
                     GestureDetector(
                       onTap: () {
-                        Get.to(TaskDescriptionHome(comingFrom: "booking",));
+                        Get.to(TaskDescriptionHome(comingFrom: "booking", taskData: {},));
                       },
                       child: Container(
                         height: 35.h,

@@ -10,8 +10,8 @@ import 'package:repairoo/widgets/custom_input_fields.dart';
 
 import 'home_screen_for_tech/components/customer_bid.dart';
 
-class CustomerrBidBottomSheet extends StatelessWidget {
-  const CustomerrBidBottomSheet({super.key, required this.comingFrom});
+class CustomerrBidBottomSheett extends StatelessWidget {
+  const CustomerrBidBottomSheett({super.key, required this.comingFrom});
 
   final String comingFrom;
 
@@ -144,17 +144,10 @@ class CustomerrBidBottomSheet extends StatelessWidget {
                       'customerUid': currentUserId,  // Add current user's UID
                     });
 
-                    Get.snackbar("Success", "Bid sent successfully!");
-                    Get.back();
+                    // Close bottom sheet and show success snackbar
+                    Get.back(); // Close the bottom sheet
+                    Get.snackbar("Success", "Bid has been placed successfully!");
 
-                    if (comingFrom == "tech") {
-                      Get.bottomSheet(
-                        isScrollControlled: true,
-                        isDismissible: true,
-                        enableDrag: true,
-                        const CustomerBidBottomSheet(),
-                      );
-                    }
                   } catch (e) {
                     Get.snackbar("Error", "Failed to send bid: $e");
                   }

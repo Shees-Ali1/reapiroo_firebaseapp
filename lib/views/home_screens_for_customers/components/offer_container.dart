@@ -6,9 +6,12 @@ import 'package:repairoo/const/images.dart';
 import 'package:repairoo/const/svg_icons.dart';
 import 'package:repairoo/const/text_styles.dart';
 import 'package:repairoo/views/home_screen_for_tech/components/bid_bottom_sheet.dart';
+import 'package:repairoo/views/home_screen_for_tech/components/customer_bid.dart';
 import 'package:repairoo/views/home_screens_for_customers/search_offer_view.dart';
 import 'package:repairoo/widgets/custom_button.dart';
 import 'package:repairoo/widgets/my_svg.dart';
+
+import '../../customerbidnotify.dart';
 
 class OfferContainer extends StatefulWidget {
   const OfferContainer({super.key, required this.image, required this.name, required this.experience, required this.price, required this.rating, required this.reviews});
@@ -119,7 +122,7 @@ class _OfferContainerState extends State<OfferContainer> {
                               isScrollControlled: true,
                               isDismissible: true,
                               enableDrag: true,
-                              CustomerrBidBottomSheet(comingFrom: "customer",),
+                              CustomerrBidBottomSheett(comingFrom: '',),
                             );
                           },
                           child: Container(

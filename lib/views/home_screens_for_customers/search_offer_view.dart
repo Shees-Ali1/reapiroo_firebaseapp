@@ -409,7 +409,7 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                           isScrollControlled: true,
                           isDismissible: true,
                           enableDrag: true,
-                          CustomerrBidBottomSheet(comingFrom: "customer",),
+                          BidBottomSheet(userUid: '',),
                         );
                       },
                       child: Container(
