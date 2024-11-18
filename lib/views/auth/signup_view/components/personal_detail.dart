@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:repairoo/controllers/signup_controller.dart';
 import '../../../../const/color.dart';
 import '../../../../const/text_styles.dart';
 import '../../../../controllers/tech_controller.dart';
@@ -21,10 +22,13 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TechController techController = Get.find();
+  final SignupController signupController = Get.find();
   String? selectedGender;
 
   @override
   Widget build(BuildContext context) {
+    print(signupController.userRole.value);
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

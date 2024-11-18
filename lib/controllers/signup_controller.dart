@@ -19,8 +19,11 @@ class SignupController extends GetxController {
   var selectedGender = ''.obs;
 
   RxString VerificationId = ''.obs;
+  // Method to update gender
   void updateGender(String? gender) {
-    selectedGender.value = gender ?? ''; // Update the selected gender
+    if (gender != null) {
+      selectedGender.value = gender;
+    }
   }
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -30,19 +33,53 @@ class SignupController extends GetxController {
   final TextEditingController email = TextEditingController();
   final TextEditingController phonenumber = TextEditingController();
 
-  var imageFile = Rxn<File>(); // Declare as Rxn<File>() for reactivity
+  Rx<File?> imageFile = Rx<File?>(null); // Reactive variable for the image file
+  RxString uploadedImageUrl = ''.obs; // Reactive URL for the uploaded image
 
-  var uploadedImageUrl = ''.obs; // Store the uploaded image URL
-  // var isLoading = false.obs; // Track loading state
+  // void pickImage() async {
+  //   final ImagePicker picker = ImagePicker();
+  //   final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  //
+  //   if (pickedFile != null) {
+  //     imageFile.value = File(pickedFile.path); // Update reactively
+  //   }
+  // }
 
-  void pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  Future<void> pickImageAndUpload(String userId) async {
+    try {
+      isLoading.value = true; // Start loading
 
-    if (pickedFile != null) {
-      imageFile.value = File(pickedFile.path); // Update reactively
+      // Pick image from gallery
+      final ImagePicker picker = ImagePicker();
+      final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        // Update reactive variable with the selected file
+        imageFile.value = File(pickedFile.path);
+
+        // Prepare for Firebase Storage upload
+        final String fileName = '${userId}_${DateTime.now().millisecondsSinceEpoch}';
+        final Reference storageReference =
+        FirebaseStorage.instance.ref().child('uploads/$userId/$fileName');
+
+        // Upload image to Firebase Storage
+        final UploadTask uploadTask = storageReference.putFile(imageFile.value!);
+        final TaskSnapshot taskSnapshot = await uploadTask;
+
+        // Get download URL
+        final String imageUrl = await taskSnapshot.ref.getDownloadURL();
+        uploadedImageUrl.value = imageUrl; // Reactive URL update
+        print('Image uploaded successfully: $imageUrl');
+      } else {
+        print('No image selected.');
+      }
+    } catch (e) {
+      print('Error during image picking/uploading: $e');
+    } finally {
+      isLoading.value = false; // Stop loading
     }
   }
+
   Future<bool> loginWithEmailPassword(String email, String password) async {
     try {
       // Your login logic here
@@ -57,30 +94,6 @@ class SignupController extends GetxController {
     } catch (e) {
       print('Error logging in: $e');
       return false; // Login failed
-    }
-  }
-  // Function to upload image to Firebase Storage and get the URL
-  Future<void> uploadImage(String userId) async {
-    if (imageFile.value == null) return; // Exit if no image selected
-    try {
-      isLoading.value = true;
-
-      // Get a reference to the Firebase Storage location
-      Reference storageReference = FirebaseStorage.instance
-          .ref()
-          .child('profile_images')
-          .child('$userId.jpg'); // Customize the file name as needed
-
-      // Upload the image
-      UploadTask uploadTask = storageReference.putFile(imageFile.value!);
-      TaskSnapshot taskSnapshot = await uploadTask;
-      // Get the download URL of the uploaded image
-      String imageUrl = await taskSnapshot.ref.getDownloadURL();
-      uploadedImageUrl.value = imageUrl; // Update the URL reactively
-    } catch (e) {
-      print('Error uploading image to Firebase Storage: $e');
-    } finally {
-      isLoading.value = false;
     }
   }
 
@@ -212,6 +225,8 @@ class SignupController extends GetxController {
       'phoneNumber': phonenumber.text,
       'image': uploadedImageUrl.value.isNotEmpty ? uploadedImageUrl.value : '',
       'role': userRole.value, // Store the selected role
+      'createdAt': FieldValue.serverTimestamp(),
+
     });
 
     // Success message and navigation

@@ -8,6 +8,7 @@ class UserController extends GetxController {
   RxString name=''.obs;
   RxString email=''.obs;
   RxString userImage = ''.obs;
+  RxString gender = ''.obs;
 
   Future<void> fetchUserData() async {
     try {
@@ -25,6 +26,7 @@ class UserController extends GetxController {
         if (userInfo.exists) {
           name.value = userInfo["userName"] ?? "";
           email.value = userInfo["userEmail"] ?? "";
+          gender.value = userInfo["gender"] ?? "";
           userImage.value = userInfo["image"] ?? "";
         } else {
           // User not found
