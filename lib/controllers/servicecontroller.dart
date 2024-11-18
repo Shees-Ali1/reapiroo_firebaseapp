@@ -45,9 +45,6 @@ class ServiceController extends GetxController {
   }
 
   // Pick date and time
-
-  // Save the data to Firestore dynamically based on the title
-  // Modify saveDataToCollection to match the expected usage
   Future<bool> saveDataToCollection({
     required String title,
     required File? imageFile, // Direct parameter for imageFile
@@ -78,23 +75,30 @@ class ServiceController extends GetxController {
       // Get the current user's UID
       String userUid = FirebaseAuth.instance.currentUser!.uid;
 
-      // Reference to the document for the current user in the collection `title`
-      DocumentReference userDocRef = FirebaseFirestore.instance
-          .collection(title)
-          .doc(userUid);
+      // Reference to the Firestore tasks collection
+      CollectionReference tasksCollection = FirebaseFirestore.instance.collection('tasks');
 
-      // Check if the document exists
-      DocumentSnapshot docSnapshot = await userDocRef.get();
+      // Query to check if any document contains the current user's UID
+      QuerySnapshot querySnapshot = await tasksCollection
+          .where("userUid", isEqualTo: userUid) // Check for the UID in the "userUid" field
+          .get();
 
-      if (!docSnapshot.exists) {
-        // If the document doesn't exist, create it
-        await userDocRef.set({
-          'userData': [data],
+      if (querySnapshot.docs.isNotEmpty) {
+        // If a document exists with the current user's UID
+        DocumentReference existingDocRef = querySnapshot.docs.first.reference;
+
+        // Add a new array for the given title in the existing document
+        await existingDocRef.update({
+          title: [data], // Create a new array field with the title as key
         });
       } else {
-        // If the document exists, update the userData array
-        await userDocRef.update({
-          'userData': FieldValue.arrayUnion([data]),
+        // If no document exists with the current user's UID, create a new document
+        DocumentReference newDocRef = tasksCollection.doc(); // Firestore generates a random ID
+
+        // Initialize the new document with the userUid and the array for the given title
+        await newDocRef.set({
+          "userUid": userUid, // Store the current user's UID inside the document
+          title: [data], // Create a new array field with the title as key
         });
       }
 
@@ -107,6 +111,7 @@ class ServiceController extends GetxController {
       return false;
     }
   }
+
 
 
 // Method to generate a 4-digit random ID

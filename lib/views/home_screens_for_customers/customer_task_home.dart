@@ -35,6 +35,7 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
   final HomeController customerVM = Get.find<HomeController>();
   final ServiceController serviceController = Get.find<ServiceController>();
   final TextEditingController task = TextEditingController();
+  final TextEditingController voice = TextEditingController();
   FlutterSoundRecorder? _recorder;
   File? _audioFile;
   bool _isRecording = false;
@@ -544,8 +545,45 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                       ),
                     ),
                   ),
-
-                  // Custom Input Field (Task Description)
+                  // CustomInputField(controller: voice,hintText: 'Record Voice Note',),
+                  Container(
+                    height: 55.h,
+                    margin: EdgeInsets.only(bottom: 6.h),
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(horizontal: 15.w),
+                    decoration: BoxDecoration(
+                      color: Color(0xffFAFAFA),
+                      border: Border.all(color: Color(0xffE2E2E2), width: 1),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Record Voice Note                ',
+                          style: jost400(14.sp, Colors.black), // Assuming jost400 is your custom text style
+                        ),
+                        _isRecording
+                            ? IconButton(
+                          icon: Icon(Icons.stop),
+                          onPressed: _stopRecording,
+                          color: Colors.red,
+                        )
+                            : IconButton(
+                          icon: Icon(Icons.mic),
+                          onPressed: _startRecording,
+                          color: Colors.black,
+                        ),
+                        // Optional progress indicator
+                        _isRecording
+                            ? CircularProgressIndicator(
+                          value: _progressValue,
+                          strokeWidth: 2,
+                        )
+                            : Container(),
+                      ],
+                    ),
+                  ),
                   CustomInputField(
                     maxLines: 4,
                     controller: task,
