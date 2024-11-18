@@ -119,7 +119,7 @@ class _OfferContainerState extends State<OfferContainer> {
                               isScrollControlled: true,
                               isDismissible: true,
                               enableDrag: true,
-                              BidBottomSheet(comingFrom: "customer",),
+                              CustomerrBidBottomSheet(comingFrom: "customer",),
                             );
                           },
                           child: Container(

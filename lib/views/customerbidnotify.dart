@@ -8,7 +8,7 @@ import 'package:repairoo/const/text_styles.dart';
 import 'package:repairoo/widgets/custom_button.dart';
 import 'package:repairoo/widgets/custom_input_fields.dart';
 
-import 'customer_bid.dart';
+import 'home_screen_for_tech/components/customer_bid.dart';
 
 class CustomerrBidBottomSheet extends StatelessWidget {
   const CustomerrBidBottomSheet({super.key, required this.comingFrom});
@@ -71,8 +71,8 @@ class CustomerrBidBottomSheet extends StatelessWidget {
             ),
             SizedBox(height: 21.h),
             CustomElevatedButton(
-              text: comingFrom == "customer" ? "Offer" : "Send Bid",
-              fontSize: 16.sp,
+                text: comingFrom == "customer" ? "Offer" : "Send Bid",
+                fontSize: 16.sp,
                 onPressed: () async {
                   final String bidAmount = bidController.text.trim();
                   final String message = messageController.text.trim();
