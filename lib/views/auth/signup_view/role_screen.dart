@@ -58,45 +58,40 @@ class _RoleScreenState extends State<RoleScreen> {
             ),
           ),
           SizedBox(height: 40.h),
-          Obx(() {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    signupController.userRole.value = "Customer";
-                    signupController.selectedIndex.value = 0;
-                    if (kDebugMode) {
-                      print(signupController.userRole.value);
-                    }
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  signupController.userRole.value = "Customer";
+                  signupController.selectedIndex.value = 0;
+                  if (kDebugMode) {
+                    print(signupController.userRole.value);
+                  }
 
-                  },
-                  child: buildContainer(
-                    'Customer',
-                    AppImages.Customer,
-                    isSelected: signupController.selectedIndex == 0,
-                  ),
+                },
+                child: buildContainer(
+                  'Customer',
+                  AppImages.Customer,
+                  isSelected: signupController.selectedIndex == 0,
                 ),
-                SizedBox(
-                  width: 19.w,
+              ),
+              SizedBox(
+                width: 19.w,
+              ),
+              GestureDetector(
+                onTap: () {
+                  signupController.userRole.value = "Tech";
+                  signupController.selectedIndex.value = 1;
+                },
+                child: buildContainer(
+                  'Tech',
+                  AppImages.Engineer,
+                  isSelected: signupController.selectedIndex == 1,
                 ),
-                GestureDetector(
-                  onTap: () {
-                    signupController.userRole.value = "Tech";
-                    signupController.selectedIndex.value = 1;
-                    if (kDebugMode) {
-                      print(signupController.userRole.value);
-                    }
-                  },
-                  child: buildContainer(
-                    'Tech',
-                    AppImages.Engineer,
-                    isSelected: signupController.selectedIndex == 1,
-                  ),
-                ),
-              ],
-            );
-          }),
+              ),
+            ],
+          ),
           SizedBox(
             height: 33.h,
           ),
@@ -129,7 +124,6 @@ class _RoleScreenState extends State<RoleScreen> {
           ),
           SizedBox(
             height: 14.h,
-
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 18.w),

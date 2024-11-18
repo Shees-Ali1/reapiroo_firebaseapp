@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/get.dart';
-import 'package:repairoo/controllers/signup_controller.dart';
 import '../const/color.dart';
 import '../const/text_styles.dart';
 import '../controllers/tech_controller.dart';
@@ -13,17 +12,14 @@ class GenderDropdownField extends StatelessWidget {
   final double iconHeight;
   final double iconWidth;
   final void Function(String?)? onChanged;
-  final TechController techController = Get.put(TechController());
-  final SignupController signupController = Get.put(SignupController()); // Inject the controller
-// Inject TechController
   final TechController techController = Get.find(); // Use Get.find() to ensure the same instance
 
   GenderDropdownField({
     required this.label,
     required this.iconPath,
     this.onChanged,
-    this.iconHeight = 24.0, // Default height
-    this.iconWidth = 24.0,  // Default width
+    this.iconHeight = 24.0,
+    this.iconWidth = 24.0,
   });
 
   @override
@@ -86,8 +82,6 @@ class GenderDropdownField extends StatelessWidget {
           );
         }).toList(),
         onChanged: (String? newValue) {
-          signupController.updateGender(newValue); // Update the controller on change
-          // techController.updateGender(newValue);
           if (newValue != null) {
             techController.updateGender(newValue); // Update controller
           }

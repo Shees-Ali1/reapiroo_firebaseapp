@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ServiceController extends GetxController {
   var imageFile = Rx<File?>(null); // Observable for the selected image
@@ -17,7 +18,9 @@ class ServiceController extends GetxController {
   var voiceNoteUrl = Rx<String?>(null); // Observable for voice note URL
   var taskDescription = Rx<String>(""); // Observable for task description
   var uploadSpareParts = Rx<bool>(false); // Observable for spare parts upload status
-  var location = ''.obs;  // Use '.obs' to make it reactive
+  var location = ''.obs; // Use '.obs' to make it reactive
+  var isRecording = false.obs; // Observable boolean for recording state
+  var progressValue = 0.0.obs; // Observable double for progress value
 
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder(); // Initialize FlutterSoundRecorder
   bool _isRecording = false;
@@ -44,7 +47,7 @@ class ServiceController extends GetxController {
     imageFile.value = null; // Clear the observable
   }
 
-  // Pick date and time
+  // Save data to Firestore
   Future<bool> saveDataToCollection({
     required String title,
     required File? imageFile, // Direct parameter for imageFile
@@ -56,6 +59,18 @@ class ServiceController extends GetxController {
 
       // Handle DateTime (use current time if null)
       DateTime dateToSave = selectedDateTime ?? DateTime.now();
+
+      // Get the current user's UID
+      String userUid = FirebaseAuth.instance.currentUser!.uid;
+
+      // Fetch the user's name from the 'userDetails' collection using the user's UID
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('userDetails')
+          .doc(userUid)
+          .get();
+
+      // Extract the username from the document
+      String userName = userDoc.exists ? userDoc['userName'] : 'Unknown User'; // Default to 'Unknown User' if not found
 
       // Create a new map of the data to be saved
       Map<String, dynamic> data = {
@@ -70,10 +85,9 @@ class ServiceController extends GetxController {
         "location": Get.find<LocationController>().location.value, // Use location.value here
         "randomId": randomId,
         "selectedDateTime": dateToSave.toIso8601String(), // Store the selected date-time as ISO string
+        "userName": userName, // Add the logged-in user's name here
+        "title": title, // Add the logged-in user's name here
       };
-
-      // Get the current user's UID
-      String userUid = FirebaseAuth.instance.currentUser!.uid;
 
       // Reference to the Firestore tasks collection
       CollectionReference tasksCollection = FirebaseFirestore.instance.collection('tasks');
@@ -112,14 +126,11 @@ class ServiceController extends GetxController {
     }
   }
 
-
-
-// Method to generate a 4-digit random ID
+  // Generate a 4-digit random ID
   String _generateRandomId() {
     final random = Random();
-    return (1000 + random.nextInt(9000)).toString();  // Generates a 4-digit number
+    return (1000 + random.nextInt(9000)).toString(); // Generates a 4-digit number
   }
-
 
   // Upload the image to Firebase Storage and return the URL
   Future<String> _uploadImage(File image, String title) async {
@@ -135,50 +146,45 @@ class ServiceController extends GetxController {
     }
   }
 
-  // Record voice note and save URL
+  // Record voice note
   Future<void> recordVoiceNote() async {
     var status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) {
       throw RecordingPermissionException('Microphone permission not granted');
     }
 
-    // Ensure recorder is initialized
     await _recorder.openRecorder();
 
     String path = await _getRecordingPath();
-    _audioFilePath = path; // Store the file path
+    _audioFilePath = path;
 
     await _recorder.startRecorder(toFile: path);
 
     _isRecording = true;
     _progressValue = 0.0;
 
-    // Start a timer that updates the progress every 100 milliseconds over 1 minute
     _progressTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-      _progressValue += 100 / 60000; // Increment progress based on 1 minute (60,000 ms)
+      _progressValue += 100 / 60000; // Increment progress for 1 minute
       if (_progressValue >= 1.0) {
-        _stopRecording(); // Automatically stop recording when time is up
+        stopRecording(); // Call stopRecording instead of _stopRecording
       }
     });
   }
 
-  // Stop the voice recording
-  Future<void> _stopRecording() async {
+  // Method to stop recording (public)
+  Future<void> stopRecording() async {
     await _recorder.stopRecorder();
     _progressTimer?.cancel();
     _isRecording = false;
     _progressValue = 0.0;
 
     if (_audioFilePath != null) {
-      // Upload the voice note to Firebase and get the URL
       String downloadUrl = await _uploadVoiceNote(File(_audioFilePath!));
       voiceNoteUrl.value = downloadUrl;
-
-      Get.snackbar("Recording", "Recording stopped, voice note uploaded.");
     }
   }
 
-  // Upload the voice note file to Firebase Storage and return the download URL
+  // Helper methods for uploading and getting file path are unchanged
   Future<String> _uploadVoiceNote(File voiceNoteFile) async {
     try {
       final storageRef = FirebaseStorage.instance
@@ -192,20 +198,19 @@ class ServiceController extends GetxController {
     }
   }
 
-
-  // Get the path to store the recording
   Future<String> _getRecordingPath() async {
     final directory = await getApplicationDocumentsDirectory();
     return '${directory.path}/audio_recording.aac';
   }
 }
 
+// Example location controller
 class LocationController extends GetxController {
-  // Observable variable for the location
   var location = ''.obs;
 
-  // Method to update the location value
   void updateLocation(String newLocation) {
     location.value = newLocation;
   }
 }
+
+

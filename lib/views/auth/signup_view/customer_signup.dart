@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -25,6 +24,7 @@ class CustomerSignup extends StatefulWidget {
 }
 
 class _CustomerSignupState extends State<CustomerSignup> {
+
   final SignupController signupController = Get.find<SignupController>();
   @override
   void initState() {
@@ -32,10 +32,13 @@ class _CustomerSignupState extends State<CustomerSignup> {
     super.initState();
     signupController.phonenumber.clear();
     signupController.email.clear();
+    signupController.password.clear();
+
     signupController.name.clear();
-    signupController.selectedGender.value = '';
+    signupController.selectedGender.value ='';
     // signupController.imageFile?.clear();
   }
+
 
   // void _showImageSourceDialog(BuildContext context) {
   //   showDialog(
@@ -88,6 +91,7 @@ class _CustomerSignupState extends State<CustomerSignup> {
         body: SingleChildScrollView(
           child: Column(
             children: [
+
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -114,14 +118,9 @@ class _CustomerSignupState extends State<CustomerSignup> {
                     ),
                     SizedBox(height: 30.h),
                     GestureDetector(
-                      onTap: () {
-                        signupController.pickImageAndUpload(FirebaseAuth
-                            .instance
-                            .currentUser!
-                            .uid); // Replace 'USER_ID_HERE' dynamically
-                      },
+                      onTap: () => signupController.pickImage(),
                       child: Obx(
-                        () => Container(
+                            () => Container(
                           width: 106.w,
                           height: 106.h,
                           decoration: BoxDecoration(
@@ -129,29 +128,30 @@ class _CustomerSignupState extends State<CustomerSignup> {
                             shape: BoxShape.circle,
                             image: signupController.imageFile.value != null
                                 ? DecorationImage(
-                                    image: FileImage(
-                                        signupController.imageFile.value!),
-                                    fit: BoxFit.cover,
-                                  )
+                              image: FileImage(signupController.imageFile.value!),
+                              fit: BoxFit.cover,
+                            )
                                 : null,
                           ),
                           child: signupController.imageFile.value == null
                               ? Center(
-                                  child: signupController.isLoading.value
-                                      ? CircularProgressIndicator() // Show loader during upload
-                                      : SizedBox(
-                                          height: 50.h,
-                                          width: 50.w,
-                                          child: Image.asset(
-                                            AppImages.upload_img,
-                                            color: AppColors.primary,
-                                          ),
-                                        ),
-                                )
+                            child: SizedBox(
+                              height: 50.h,
+                              width: 50.w,
+                              child: Image.asset(
+                                AppImages.upload_img,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          )
                               : null,
                         ),
                       ),
                     ),
+
+
+
+
                     SizedBox(height: 30.h),
                   ],
                 ),
@@ -186,17 +186,18 @@ class _CustomerSignupState extends State<CustomerSignup> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 child: IntlPhoneField(
+
                   controller: signupController.phonenumber,
                   flagsButtonPadding: EdgeInsets.only(left: 13.w),
                   cursorColor: Colors.black,
                   style: TextStyle(color: Colors.black),
                   showDropdownIcon: false,
                   decoration: InputDecoration(
+
                     hintText: 'Your phone number',
                     filled: true,
                     fillColor: Color(0xffFAFAFA),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 14.h),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 14.h),
                     counterText: '',
                     hintStyle: TextStyle(
                       color: Colors.black,
@@ -206,29 +207,40 @@ class _CustomerSignupState extends State<CustomerSignup> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(13.31.r),
-                      borderSide:
-                          BorderSide(color: Color(0xffE2E2E2), width: 0.95),
+                      borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(13.31.r),
-                      borderSide:
-                          BorderSide(color: Color(0xffE2E2E2), width: 0.95),
+                      borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(13.31.r),
-                      borderSide:
-                          BorderSide(color: Color(0xffE2E2E2), width: 0.95),
+                      borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
                     ),
                   ),
                   initialCountryCode: 'AE',
                   onChanged: (phone) {
                     try {
-                      debugPrint(
-                          "Phone number entered: ${phone.completeNumber}");
+                      debugPrint("Phone number entered: ${phone.completeNumber}");
                     } catch (e) {
                       debugPrint("Error processing phone number: $e");
                     }
                   },
+                ),
+              ),
+              SizedBox(height: 16.h),
+
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: CustomInputField(
+                  label: 'Password',
+                  controller: signupController.password,
+                  obscureText: true, // Hide the password text
+                  prefixIcon: Icon(
+                    Icons.lock,
+                    color: AppColors.primary,
+                    size: 18.sp,
+                  ), // Add prefix icon here
                 ),
               ),
               SizedBox(height: 16.h),
@@ -237,7 +249,7 @@ class _CustomerSignupState extends State<CustomerSignup> {
                 child: GenderDropdownField(
                   label: 'Gender',
                   iconPath:
-                      'assets/images/gender_icon.png', // Specify the image asset path
+                  'assets/images/gender_icon.png', // Specify the image asset path
                   iconHeight: 18.h, // Set your desired height
                   iconWidth: 18.w, // Set your desired width
                 ),
