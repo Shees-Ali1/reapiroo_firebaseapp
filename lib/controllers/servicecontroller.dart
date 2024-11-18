@@ -73,7 +73,7 @@ class ServiceController extends GetxController {
       String userName = userDoc.exists ? userDoc['userName'] : 'Unknown User'; // Default to 'Unknown User' if not found
 
       // Create a new map of the data to be saved
-      Map<String, dynamic> data = {
+      Map<String, dynamic> newData = {
         "taskDescription": taskDescription.value,
         "imageUrl": imageFile != null
             ? await _uploadImage(imageFile, title)
@@ -101,9 +101,9 @@ class ServiceController extends GetxController {
         // If a document exists with the current user's UID
         DocumentReference existingDocRef = querySnapshot.docs.first.reference;
 
-        // Add a new array for the given title in the existing document
+        // Use Firestore's arrayUnion to append the new data to the existing array
         await existingDocRef.update({
-          title: [data], // Create a new array field with the title as key
+          title: FieldValue.arrayUnion([newData]), // Append the new object to the array
         });
       } else {
         // If no document exists with the current user's UID, create a new document
@@ -112,7 +112,7 @@ class ServiceController extends GetxController {
         // Initialize the new document with the userUid and the array for the given title
         await newDocRef.set({
           "userUid": userUid, // Store the current user's UID inside the document
-          title: [data], // Create a new array field with the title as key
+          title: [newData], // Create a new array field with the title as key
         });
       }
 

@@ -121,7 +121,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                             ),
                           ),
                           Text(
-                            '15 reviews',
+                            '1 reviews',
                             style: jost500(
                               14.sp,
                               AppColors.buttontext,

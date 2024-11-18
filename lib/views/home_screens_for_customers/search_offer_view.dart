@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -31,11 +33,7 @@ class _SearchOfferViewState extends State<SearchOfferView> {
   // Mockup reviews data for each rating
   final Map<String, List<Map<String, String>>> reviewsData = {
     "5 stars": [
-      {
-        "name": "Ryosuke Tanaka",
-        "date": "August 5, 2023",
-        "comment": "Natalie offers an impressive array of features and resources, making it a truly awesome tool for learning, fantastic choice for anyone looking to enhance their learning journey.",
-      },
+
       {
         "name": "John Doe",
         "date": "July 12, 2023",
@@ -300,13 +298,95 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: (){
-                        Get.bottomSheet(
-                          isScrollControlled: true,
-                          isDismissible: true,
-                          enableDrag: true,
-                          JobAcceptedBottomsheet(name: widget.name, price: widget.price,),
-                        );
+                      onTap: () async {
+                        // Fetch the current user's UID from FirebaseAuth
+                        final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
+
+                        if (currentUserId == null) {
+                          Get.snackbar("Error", "User not logged in.");
+                          return;
+                        }
+
+                        // Get bid amount (price) from the widget
+                        final String bidAmount = widget.price; // Assuming the bid amount is the widget's price
+                        if (bidAmount.isEmpty) {
+                          Get.snackbar("Error", "Bid amount cannot be empty.");
+                          return;
+                        }
+
+                        try {
+                          // Query the 'tasks' collection to get the bidderId
+                          final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                              .collection('tasks')
+                              .where('userUid', isEqualTo: currentUserId)
+                              .get();
+
+                          if (querySnapshot.docs.isEmpty) {
+                            Get.snackbar("Error", "No tasks found for the current user.");
+                            return;
+                          }
+
+                          String? matchingBidderId;
+
+                          // Loop through the matching documents to find the bidderId
+                          for (var doc in querySnapshot.docs) {
+                            final data = doc.data() as Map<String, dynamic>;
+
+                            // Search for bidderId in each key that contains a list
+                            for (var entry in data.entries) {
+                              if (entry.value is List) {
+                                final List<dynamic> bids = entry.value;
+
+                                for (var bid in bids) {
+                                  if (bid is Map<String, dynamic> && bid.containsKey('bidderId')) {
+                                    matchingBidderId = bid['bidderId'];
+                                    break;
+                                  }
+                                }
+                              }
+
+                              // Break the loop if a matching bidderId is found
+                              if (matchingBidderId != null) break;
+                            }
+
+                            // Stop if a matching bidderId is found
+                            if (matchingBidderId != null) break;
+                          }
+
+                          if (matchingBidderId == null) {
+                            Get.snackbar("Error", "No bidderId found for the current user.");
+                            return;
+                          }
+
+                          // Store data to the 'accepted_bid' collection
+                          await FirebaseFirestore.instance.collection('JobAccepted').add({
+                            'bidAmount': bidAmount,
+                            'customerUid': currentUserId,  // Store current user's UID as the customerUid
+                            'vendorName': widget.name,  // Vendor's name from widget
+                            'vendorRating': widget.rating,  // Vendor's rating
+                            'vendorExperience': widget.experience,  // Vendor's experience
+                            'vendorReviews': widget.reviews,  // Vendor's reviews
+                            'timestamp': FieldValue.serverTimestamp(),  // Timestamp for when the bid is placed
+                            'bidderId': matchingBidderId,  // Store the fetched bidderId
+                          });
+
+                          // Show a GetX Snackbar before opening the bottom sheet
+                          Get.snackbar("Success", "Job Accepted successfully!",
+                              snackPosition: SnackPosition.TOP, backgroundColor: Colors.green, colorText: Colors.white);
+
+                          // Open the bottom sheet after storing the bid data
+                          Get.bottomSheet(
+                            isScrollControlled: true,
+                            isDismissible: true,
+                            enableDrag: true,
+                            JobAcceptedBottomsheet(
+                              name: widget.name,
+                              price: widget.price,
+                            ),
+                          );
+                        } catch (e) {
+                          Get.snackbar("Error", "Failed to accept bid: $e");
+                        }
                       },
                       child: Container(
                         margin: EdgeInsets.only(right: 8.w),
@@ -317,7 +397,9 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                           color: AppColors.primary,
                         ),
                         alignment: Alignment.center,
-                        child: Text("Accept", style: jost600(22.sp, AppColors.secondary),
+                        child: Text(
+                          "Accept",
+                          style: jost600(22.sp, AppColors.secondary),
                         ),
                       ),
                     ),
