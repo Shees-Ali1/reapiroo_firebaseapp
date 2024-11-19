@@ -18,17 +18,21 @@ class TechController extends GetxController {
   RxSet<String> selectedServices = <String>{}.obs; // Selected services
   RxList<String?> documentPaths = <String?>[].obs; // Uploaded document paths
 
+  final TextEditingController phonenumber = TextEditingController();
+
   // Update Methods
   void updateUserDetails({
     required String firstname,
     required String lastname,
     required String email,
+    required String phoneNumber,
     required String password,
     required String? gender,
   }) {
     firstName.value = firstname;
     lastName.value = lastname;
     this.email.value = email;
+    phonenumber.text = phoneNumber;
     this.password.value = password;
     selectedGender.value = gender ?? '';
   }
@@ -63,7 +67,7 @@ class TechController extends GetxController {
       // Step 1: Create user in Firebase Authentication
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email.value,
-        password: password.value,
+        password: phonenumber.text,
       );
 
       // Get the user ID from Firebase Authentication
@@ -75,6 +79,7 @@ class TechController extends GetxController {
         'firstName': firstName.value,
         'lastName': lastName.value,
         'email': email.value,
+        'phoneNumber': phonenumber.text,
         'gender': selectedGender.value,
         'bio': bio.value,
         'services': selectedServices.toList(),

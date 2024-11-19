@@ -70,7 +70,7 @@ class MainHome extends StatefulWidget {
 class _MainHomeState extends State<MainHome> {
   final TechHomeController homeVM = Get.find<TechHomeController>();
   final UserController userVM = Get.find<UserController>();
-  final NavBarController navBarController = Get.find<NavBarController>();
+  final NavBarController navBarController = Get.put(NavBarController());
 
   String? selectedOption = 'Newest'; // Default to "In Progress"
   String? serviceOption = 'All'; // Default to "In Progress"

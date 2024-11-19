@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../../../const/color.dart';
 import '../../../../const/text_styles.dart';
+import '../../../../controllers/signup_controller.dart';
 import '../../../../controllers/tech_controller.dart';
 import '../../../../widgets/custom_button.dart';
 import '../../../../widgets/custom_input_fields.dart';
@@ -21,6 +23,8 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TechController techController = Get.find();
+  final SignupController signupController = Get.find<SignupController>();
+
   String? selectedGender;
 
   @override
@@ -78,6 +82,49 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
             ),
           ),
           SizedBox(height: 25.h),
+          IntlPhoneField(
+
+            controller: signupController.phonenumber,
+            flagsButtonPadding: EdgeInsets.only(left: 13.w),
+            cursorColor: Colors.black,
+            style: TextStyle(color: Colors.black),
+            showDropdownIcon: false,
+            decoration: InputDecoration(
+
+              hintText: 'Your phone number',
+              filled: true,
+              fillColor: Color(0xffFAFAFA),
+              contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 14.h),
+              counterText: '',
+              hintStyle: TextStyle(
+                color: Colors.black,
+                fontFamily: 'jost',
+                fontSize: 14.65.sp,
+                fontWeight: FontWeight.w400,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(13.31.r),
+                borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(13.31.r),
+                borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(13.31.r),
+                borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
+              ),
+            ),
+            initialCountryCode: 'AE',
+            onChanged: (phone) {
+              try {
+                debugPrint("Phone number entered: ${phone.completeNumber}");
+              } catch (e) {
+                debugPrint("Error processing phone number: $e");
+              }
+            },
+          ),
+          SizedBox(height: 25.h),
 
           CustomInputField(
             controller: password,
@@ -114,6 +161,7 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
                 firstname: firstname.text,
                 lastname: lastname.text,
                 email: email.text,
+                phoneNumber: signupController.phonenumber.text,
                 password: password.text,
                 gender: selectedGender,
               );

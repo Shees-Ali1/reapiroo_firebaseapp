@@ -4,6 +4,8 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/get.dart';
 import '../const/color.dart';
 import '../const/text_styles.dart';
+import '../controllers/drop_down_controller.dart';
+import '../controllers/signup_controller.dart';
 import '../controllers/tech_controller.dart';
 
 class GenderDropdownField extends StatelessWidget {
@@ -12,8 +14,9 @@ class GenderDropdownField extends StatelessWidget {
   final double iconHeight;
   final double iconWidth;
   final void Function(String?)? onChanged;
-  final TechController techController = Get.find(); // Use Get.find() to ensure the same instance
 
+  final GenderController genderController = Get.put(GenderController()); // Inject the controller
+  final SignupController signupController = Get.put(SignupController()); // Inject the controller
   GenderDropdownField({
     required this.label,
     required this.iconPath,
@@ -31,9 +34,9 @@ class GenderDropdownField extends StatelessWidget {
         borderRadius: BorderRadius.circular(13.31.r),
       ),
       child: DropdownButtonFormField<String>(
-        value: techController.selectedGender.value.isEmpty
+        value: signupController.selectedGender.value.isEmpty
             ? null
-            : techController.selectedGender.value,
+            : signupController.selectedGender.value,
         decoration: InputDecoration(
           filled: true,
           fillColor: AppColors.fill,
@@ -83,7 +86,7 @@ class GenderDropdownField extends StatelessWidget {
         }).toList(),
         onChanged: (String? newValue) {
           if (newValue != null) {
-            techController.updateGender(newValue); // Update controller
+            signupController.updateGender(newValue);// Update controller
           }
           if (onChanged != null) {
             onChanged!(newValue); // Trigger any additional behavior

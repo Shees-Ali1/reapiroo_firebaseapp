@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:repairoo/const/color.dart';
 import 'package:repairoo/const/images.dart';
 import 'package:repairoo/const/text_styles.dart';
+import 'package:repairoo/views/auth/login_view/login_screen.dart';
 import 'package:repairoo/views/bottom_nav/bottom_nav.dart';
 import 'package:repairoo/widgets/custom_button.dart';
 
@@ -45,10 +47,7 @@ class PendingApproval extends StatelessWidget {
               textColor: AppColors.secondary,
               onPressed: () {
                 if (isAccountVerified()) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AppNavBar()),
-                  );
+                  Get.offAll(() => LoginScreen());
                 } else {
                   showDialog(
                     context: context,

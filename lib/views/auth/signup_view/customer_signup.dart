@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,7 +25,6 @@ class CustomerSignup extends StatefulWidget {
 }
 
 class _CustomerSignupState extends State<CustomerSignup> {
-
   final SignupController signupController = Get.find<SignupController>();
   @override
   void initState() {
@@ -35,10 +35,9 @@ class _CustomerSignupState extends State<CustomerSignup> {
     signupController.password.clear();
 
     signupController.name.clear();
-    signupController.selectedGender.value ='';
+    signupController.selectedGender.value = '';
     // signupController.imageFile?.clear();
   }
-
 
   // void _showImageSourceDialog(BuildContext context) {
   //   showDialog(
@@ -91,7 +90,6 @@ class _CustomerSignupState extends State<CustomerSignup> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -118,7 +116,19 @@ class _CustomerSignupState extends State<CustomerSignup> {
                     ),
                     SizedBox(height: 30.h),
                     GestureDetector(
-                      onTap: () => signupController.pickImage(),
+                      onTap: () async {
+                        try {
+                          // Generate a temporary unique ID for signup (e.g., UUID or timestamp)
+                          final String tempUserId = DateTime.now().millisecondsSinceEpoch.toString();
+
+                          print('Temporary User ID for signup: $tempUserId');
+
+                          // Call the image picker and upload function with the temporary ID
+                          await signupController.pickImageAndUpload(tempUserId);
+                        } catch (e) {
+                          print('Error occurred in onTap: $e');
+                        }
+                      },
                       child: Obx(
                             () => Container(
                           width: 106.w,
@@ -149,9 +159,6 @@ class _CustomerSignupState extends State<CustomerSignup> {
                       ),
                     ),
 
-
-
-
                     SizedBox(height: 30.h),
                   ],
                 ),
@@ -162,6 +169,7 @@ class _CustomerSignupState extends State<CustomerSignup> {
                 child: CustomInputField(
                   label: 'Full name',
                   controller: signupController.name,
+
                   prefixIcon: Icon(
                     Icons.person,
                     color: AppColors.primary,
@@ -228,28 +236,28 @@ class _CustomerSignupState extends State<CustomerSignup> {
                   },
                 ),
               ),
-              SizedBox(height: 16.h),
-
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: CustomInputField(
-                  label: 'Password',
-                  controller: signupController.password,
-                  obscureText: true, // Hide the password text
-                  prefixIcon: Icon(
-                    Icons.lock,
-                    color: AppColors.primary,
-                    size: 18.sp,
-                  ), // Add prefix icon here
-                ),
-              ),
+              // SizedBox(height: 16.h),
+              //
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 24.w),
+              //   child: CustomInputField(
+              //     label: 'Password',
+              //     controller: signupController.password,
+              //     obscureText: true, // Hide the password text
+              //     prefixIcon: Icon(
+              //       Icons.lock,
+              //       color: AppColors.primary,
+              //       size: 18.sp,
+              //     ), // Add prefix icon here
+              //   ),
+              // ),
               SizedBox(height: 16.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 child: GenderDropdownField(
                   label: 'Gender',
                   iconPath:
-                  'assets/images/gender_icon.png', // Specify the image asset path
+                      'assets/images/gender_icon.png', // Specify the image asset path
                   iconHeight: 18.h, // Set your desired height
                   iconWidth: 18.w, // Set your desired width
                 ),

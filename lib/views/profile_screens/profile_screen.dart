@@ -7,6 +7,7 @@ import 'package:repairoo/const/svg_icons.dart';
 import 'package:repairoo/const/text_styles.dart';
 import 'package:repairoo/controllers/nav_bar_controller.dart';
 import 'package:repairoo/controllers/user_controller.dart';
+import 'package:repairoo/views/auth/login_view/login_screen.dart';
 import 'package:repairoo/views/auth/signup_view/role_screen.dart';
 import 'package:repairoo/views/customer_wallet_screen/wallet_screen.dart';
 import 'package:repairoo/views/notification_screen/notification_screen.dart';
@@ -279,7 +280,7 @@ class _EditProfileScreenState extends State<ProfileScreen> {
               userVM.userRole.value == "Customer"
                   ? GestureDetector(
                       onTap: () {
-                        Get.offAll(RoleScreen());
+                        Get.offAll(LoginScreen());
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 21.w),

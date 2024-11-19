@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:repairoo/const/color.dart';
+import 'package:repairoo/controllers/signup_controller.dart';
 import 'package:repairoo/controllers/user_controller.dart';
 import 'package:repairoo/views/booking_screens/booking_screen_main.dart';
 import 'package:repairoo/views/chat_screens/chat_screen_main.dart';
@@ -19,7 +20,8 @@ import '../../widgets/drawer.dart';
 import '../home_screens_for_customers/customer_main_home.dart';
 
 class AppNavBar extends StatefulWidget {
-  const AppNavBar({super.key});
+ final String userRole;
+   AppNavBar({super.key, required this.userRole});
 
   @override
   State<AppNavBar> createState() => _AppNavBarState();
@@ -31,43 +33,11 @@ class _AppNavBarState extends State<AppNavBar> {
   final _pageController = PageController(initialPage: 0);
 
   final _controller = NotchBottomBarController(index: 0);
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  String userRole = '';
+  final SignupController signupController = Get.put(SignupController());
+
+
   bool isLoading = true;
-
   int maxCount = 4;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchUserRole();
-  }
-
-  Future<void> fetchUserRole() async {
-    try {
-      String uid = _auth.currentUser?.uid ?? '';
-      DocumentSnapshot userDoc = await _firestore.collection('tech_users').doc(uid).get();
-
-      if (userDoc.exists) {
-        setState(() {
-          userRole = userDoc['role'] ?? 'Customer';
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          userRole = 'Customer';
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      print("Error fetching user role: $e");
-      setState(() {
-        userRole = 'Customer'; // Default to Customer on error
-        isLoading = false;
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -85,9 +55,8 @@ class _AppNavBarState extends State<AppNavBar> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Center(child: CircularProgressIndicator());
-    }
+    print('role:${widget.userRole}');
+
 
     bool isIpad = MediaQuery.of(context).size.width > 600;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -99,29 +68,35 @@ class _AppNavBarState extends State<AppNavBar> {
     double iconScale = iconHeight / 20;
 
     // Move bottomBarPages into build method to ensure userVM is accessible
-    List<Widget> bottomBarPages = [
-      userRole == "Tech" ? HomeScreen() : CustomerMainHome(),
-      // if (userVM.userRole.value != "Customer") OrderScreen(),
+    // Inside the build method
+    List<Widget> bottomBarPages = widget.userRole == "Customer"
+        ? [
+      CustomerMainHome(),
+      const BookingScreenMain(),
+      const ChatsScreenMain(),
+      const ProfileScreen(),
+    ]
+        : [
+      HomeScreen(),
       const BookingScreenMain(),
       const ChatsScreenMain(),
       const ProfileScreen(),
     ];
 
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       key: navBarController.scaffoldKey,
       drawer: const MyDrawer(),
-
       body: PageView(
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),
         children: List.generate(
           bottomBarPages.length,
-              (index) => bottomBarPages[index],
+          (index) => bottomBarPages[index],
         ),
       ),
       extendBody: true,
-
       bottomNavigationBar: AnimatedNotchBottomBar(
         showBlurBottomBar: false,
         showShadow: false,
@@ -148,7 +123,6 @@ class _AppNavBarState extends State<AppNavBar> {
             activeItem: Image.asset(
               AppImages.homeicon,
               fit: BoxFit.contain,
-
               alignment: Alignment.center,
             ),
             itemLabel: 'Home'.tr,
@@ -164,7 +138,6 @@ class _AppNavBarState extends State<AppNavBar> {
             activeItem: Image.asset(
               fit: BoxFit.contain,
               alignment: Alignment.center,
-
               AppImages.bookingicon,
             ),
             itemLabel: 'Request'.tr,
@@ -174,7 +147,6 @@ class _AppNavBarState extends State<AppNavBar> {
             activeItem: Image.asset(
               alignment: Alignment.center,
               fit: BoxFit.contain,
-
               AppImages.chaticon,
             ),
             itemLabel: 'Chat'.tr,
@@ -184,7 +156,6 @@ class _AppNavBarState extends State<AppNavBar> {
             activeItem: Image.asset(
               alignment: Alignment.center,
               fit: BoxFit.contain,
-
               AppImages.profileicon,
             ),
             itemLabel: 'Profile'.tr,
