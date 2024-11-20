@@ -34,6 +34,7 @@ class BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("imagePath");
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
