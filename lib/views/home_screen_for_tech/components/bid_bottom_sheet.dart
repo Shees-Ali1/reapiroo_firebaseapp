@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:repairoo/const/color.dart';
 import 'package:repairoo/const/text_styles.dart';
 import 'package:repairoo/widgets/custom_button.dart';
 import 'package:repairoo/widgets/custom_input_fields.dart';
 
-import 'customer_bid.dart';
-
 class CustomerrBidBottomSheet extends StatelessWidget {
-  const CustomerrBidBottomSheet({super.key, required this.comingFrom});
-
   final String comingFrom;
+
+  const CustomerrBidBottomSheet({super.key, required this.comingFrom});
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController bidController = TextEditingController();
-    final TextEditingController messageController = TextEditingController(); // Controller for the message
+    final TextEditingController messageController = TextEditingController();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -73,92 +72,73 @@ class CustomerrBidBottomSheet extends StatelessWidget {
             CustomElevatedButton(
               text: comingFrom == "customer" ? "Offer" : "Send Bid",
               fontSize: 16.sp,
-                onPressed: () async {
-                  final String bidAmount = bidController.text.trim();
-                  final String message = messageController.text.trim();
+              onPressed: () async {
+                final String bidAmount = bidController.text.trim();
+                final String message = messageController.text.trim();
 
-                  // Fetch the current user's UID from FirebaseAuth
-                  final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
+                final String? currentUserId = auth.currentUser?.uid;
 
-                  if (currentUserId == null) {
-                    Get.snackbar("Error", "User not logged in.");
-                    return;
-                  }
-
-                  if (bidAmount.isEmpty) {
-                    Get.snackbar("Error", "Bid amount cannot be empty.");
-                    return;
-                  }
-
-                  try {
-                    // Query the 'tasks' collection where 'userUid' matches the current user's UID
-                    final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-                        .collection('tasks')
-                        .where('userUid', isEqualTo: currentUserId)
-                        .get();
-
-                    if (querySnapshot.docs.isEmpty) {
-                      Get.snackbar("Error", "No tasks found for the current user.");
-                      return;
-                    }
-
-                    String? matchingBidderId;
-
-                    // Loop through the matching documents
-                    for (var doc in querySnapshot.docs) {
-                      final data = doc.data() as Map<String, dynamic>;
-
-                      // Search for bidderId in each key that contains a list
-                      for (var entry in data.entries) {
-                        if (entry.value is List) {
-                          final List<dynamic> bids = entry.value;
-
-                          for (var bid in bids) {
-                            if (bid is Map<String, dynamic> && bid.containsKey('bidderId')) {
-                              matchingBidderId = bid['bidderId'];
-                              break;
-                            }
-                          }
-                        }
-
-                        // Break the loop if a matching bidderId is found
-                        if (matchingBidderId != null) break;
-                      }
-
-                      // Stop if a matching bidderId is found
-                      if (matchingBidderId != null) break;
-                    }
-
-                    if (matchingBidderId == null) {
-                      Get.snackbar("Error", "No bidderId found for the current user.");
-                      return;
-                    }
-
-                    // Add bid to "Bid Notifications" collection
-                    await FirebaseFirestore.instance.collection('Bid Notifications').add({
-                      'bidAmount': bidAmount,
-                      'message': message,
-                      'bidderId': matchingBidderId,
-                      'bidFrom': comingFrom,
-                      'timestamp': FieldValue.serverTimestamp(),
-                      'customerUid': currentUserId,  // Add current user's UID
-                    });
-
-                    Get.snackbar("Success", "Bid sent successfully!");
-                    Get.back();
-
-                    if (comingFrom == "tech") {
-                      Get.bottomSheet(
-                        isScrollControlled: true,
-                        isDismissible: true,
-                        enableDrag: true,
-                        const CustomerBidBottomSheet(),
-                      );
-                    }
-                  } catch (e) {
-                    Get.snackbar("Error", "Failed to send bid: $e");
-                  }
+                if (currentUserId == null) {
+                  Get.snackbar("Error", "User not logged in.",
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white);
+                  return;
                 }
+
+                if (bidAmount.isEmpty) {
+                  Get.snackbar("Error", "Bid amount cannot be empty.",
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white);
+                  return;
+                }
+
+                try {
+                  // Query user's bids
+                  final QuerySnapshot querySnapshot = await firestore
+                      .collection('bids')
+                      .where('customerId', isEqualTo: currentUserId)
+                      .get();
+
+                  if (querySnapshot.docs.isEmpty) {
+                    Get.snackbar("Error", "No bids found for the current user.",
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white);
+                    return;
+                  }
+
+                  // Get bidderId from the first matching bid
+                  final DocumentSnapshot bidDocument = querySnapshot.docs.first;
+                  final String matchingBidderId =
+                  (bidDocument.data() as Map<String, dynamic>)['bidderId'];
+
+                  // Add bid to "Bid Notifications"
+                  await firestore.collection('Bid Notifications').add({
+                    'bidAmount': bidAmount,
+                    'message': message,
+                    'bidderId': matchingBidderId,
+                    'bidFrom': comingFrom,
+                    'timestamp': FieldValue.serverTimestamp(),
+                    'customerUid': currentUserId,
+                  });
+
+                  // Success Snackbar
+                  Get.snackbar("Success", "Your offer has been sent successfully!",
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white);
+
+                  // Close the bottom sheet
+                  Get.back();
+                } catch (e) {
+                  Get.snackbar("Error", "Failed to send bid: ${e.toString()}",
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white);
+                }
+              },
             ),
             SizedBox(height: 29.h),
           ],

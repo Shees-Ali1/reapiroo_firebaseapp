@@ -23,7 +23,7 @@ class _BookingScreenMainState extends State<BookingScreenMain> {
 
   // Assuming you have a view model that holds the user role
   final UserController userVM = Get.put(UserController());
- // Assuming you are using GetX for state management
+  // Assuming you are using GetX for state management
 
   @override
   Widget build(BuildContext context) {
@@ -124,37 +124,7 @@ class _BookingScreenMainState extends State<BookingScreenMain> {
 
   List<DropdownMenuItem<String>> _getDropdownItems(String userRole) {
     // Return different items based on the user role
-    if (userRole != "Customer") {
-      return [
-        DropdownMenuItem(
-          value: 'All',
-          child: Text(
-            'All',
-            style: jost700(14.sp, AppColors.primary),
-          ),
-        ),DropdownMenuItem(
-          value: 'In Progress',
-          child: Text(
-            'In Progress',
-            style: jost700(14.sp, AppColors.primary),
-          ),
-        ),
-        DropdownMenuItem(
-          value: 'Completed',
-          child: Text(
-            'Completed',
-            style: jost700(14.sp, AppColors.primary),
-          ),
-        ),
-        DropdownMenuItem(
-          value: 'Canceled',
-          child: Text(
-            'Canceled',
-            style: jost700(14.sp, AppColors.primary),
-          ),
-        ),
-      ];
-    } else if (userRole == "Customer") {
+   if (userRole == "Customer") {
       return [
         DropdownMenuItem(
           value: 'All',

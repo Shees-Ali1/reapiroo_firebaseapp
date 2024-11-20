@@ -14,13 +14,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ServiceController extends GetxController {
   var imageFile = Rx<File?>(null); // Observable for the selected image
-  var dateTime = Rx<DateTime?>(null); // Observable for selected date and time
+  var videoFile = Rx<File?>(null); // Observable for the selected video
   var voiceNoteUrl = Rx<String?>(null); // Observable for voice note URL
   var taskDescription = Rx<String>(""); // Observable for task description
   var uploadSpareParts = Rx<bool>(false); // Observable for spare parts upload status
   var location = ''.obs; // Use '.obs' to make it reactive
   var isRecording = false.obs; // Observable boolean for recording state
   var progressValue = 0.0.obs; // Observable double for progress value
+  var isLoading = false.obs;
 
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder(); // Initialize FlutterSoundRecorder
   bool _isRecording = false;
@@ -42,16 +43,36 @@ class ServiceController extends GetxController {
     }
   }
 
+  // Pick a video from the gallery
+  Future<void> pickVideoFromGallery() async {
+    try {
+      final pickedFile = await ImagePicker().pickVideo(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        videoFile.value = File(pickedFile.path); // Update observable
+      } else {
+        Get.snackbar("Info", "No video selected.");
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Failed to pick a video.");
+    }
+  }
+
   // Remove the selected image
   void removeImage() {
     imageFile.value = null; // Clear the observable
   }
 
+  // Remove the selected video
+  void removeVideo() {
+    videoFile.value = null; // Clear the observable
+  }
+
   // Save data to Firestore
   Future<bool> saveDataToCollection({
     required String title,
-    required File? imageFile, // Direct parameter for imageFile
-    DateTime? selectedDateTime, // DateTime parameter, now nullable
+    required File? imageFile,
+    required File? videoFile,
+    DateTime? selectedDateTime,
   }) async {
     try {
       // Generate a 4-digit random ID
@@ -70,7 +91,7 @@ class ServiceController extends GetxController {
           .get();
 
       // Extract the username from the document
-      String userName = userDoc.exists ? userDoc['userName'] : 'Unknown User'; // Default to 'Unknown User' if not found
+      String userName = userDoc.exists ? userDoc['userName'] : 'Unknown User';
 
       // Create a new map of the data to be saved
       Map<String, dynamic> newData = {
@@ -78,12 +99,16 @@ class ServiceController extends GetxController {
         "imageUrl": imageFile != null
             ? await _uploadImage(imageFile, title)
             : null, // Upload image if available
+        "videoUrl": videoFile != null
+            ? await _uploadVideo(videoFile, title)
+            : null, // Upload video if available
         "secondImageUrl": null,
         "dateTime": Timestamp.fromDate(dateToSave), // Save dateTime as Firestore Timestamp
         "voiceNoteUrl": voiceNoteUrl.value,
         "uploadSpareParts": uploadSpareParts.value,
         "location": Get.find<LocationController>().location.value, // Use location.value here
         "randomId": randomId,
+        "userUid": userUid,
         "selectedDateTime": dateToSave.toIso8601String(), // Store the selected date-time as ISO string
         "userName": userName, // Add the logged-in user's name here
         "title": title, // Add the logged-in user's name here
@@ -101,6 +126,27 @@ class ServiceController extends GetxController {
         // If a document exists with the current user's UID
         DocumentReference existingDocRef = querySnapshot.docs.first.reference;
 
+        // Query bids collection to fetch offers for the task (related to the randomId and title)
+        QuerySnapshot bidSnapshot = await FirebaseFirestore.instance
+            .collection('bids')
+            .where('taskId', isEqualTo: randomId)  // Match the task using randomId
+            .where('title', isEqualTo: title) // Match by title as well
+            .get();
+
+        List<Map<String, dynamic>> bids = bidSnapshot.docs.map((bidDoc) {
+          final bidData = bidDoc.data() as Map<String, dynamic>;
+          return {
+            "bidAmount": bidData['bidAmount'] ?? "N/A",
+            "bidderId": bidData['bidderId'] ?? "",
+            "bidderName": bidData['firstName'] ?? "Unknown",
+          };
+        }).toList();
+
+        // Add bids to newData if any bids are found
+        if (bids.isNotEmpty) {
+          newData["bids"] = bids; // Store the bids in the task document
+        }
+
         // Use Firestore's arrayUnion to append the new data to the existing array
         await existingDocRef.update({
           title: FieldValue.arrayUnion([newData]), // Append the new object to the array
@@ -116,15 +162,26 @@ class ServiceController extends GetxController {
         });
       }
 
-      // Show success message
-      Get.snackbar("Success", "Data saved successfully.");
+      // Show success message with black and white theme
+      Get.snackbar(
+        "Success",
+        "Data saved successfully.",
+        backgroundColor: Colors.black,  // Black background
+        colorText: Colors.white,        // White text color
+      );
       return true;
     } catch (e) {
-      // Show error message in case of failure
-      Get.snackbar("Error", "Failed to save data: $e");
+      // Show error message with black and white theme
+      Get.snackbar(
+        "Error",
+        "Failed to save data: $e",
+        backgroundColor: Colors.black,  // Black background
+        colorText: Colors.white,        // White text color
+      );
       return false;
     }
   }
+
 
   // Generate a 4-digit random ID
   String _generateRandomId() {
@@ -142,6 +199,20 @@ class ServiceController extends GetxController {
       return await storageRef.getDownloadURL();
     } catch (e) {
       Get.snackbar("Error", "Failed to upload image.");
+      return "";
+    }
+  }
+
+  // Upload the video to Firebase Storage and return the URL
+  Future<String> _uploadVideo(File video, String title) async {
+    try {
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('$title/${DateTime.now().millisecondsSinceEpoch}');
+      final uploadTask = await storageRef.putFile(video);
+      return await storageRef.getDownloadURL();
+    } catch (e) {
+      Get.snackbar("Error", "Failed to upload video.");
       return "";
     }
   }

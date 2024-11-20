@@ -15,6 +15,9 @@ class BookingCard extends StatelessWidget {
   final String date;
   final String time;
   final String imagePath;
+  final String price; // Added price
+  final String taskId; // Added taskId
+  final String title; // New parameter
 
   const BookingCard({
     super.key,
@@ -24,56 +27,57 @@ class BookingCard extends StatelessWidget {
     required this.date,
     required this.time,
     required this.imagePath,
+    required this.price, // Added price
+    required this.taskId, // Added taskId
+    required this.title, // Added taskId
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      // height: .h,
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
         children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              /// In Progress
+              // In Progress Container
               Container(
                 height: 21.h,
                 width: 108.w,
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(239, 239, 239, 1),
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10.5.r,),
-                    bottomRight: Radius.circular(10.5.r,),
+                    topLeft: Radius.circular(10.5.r),
+                    bottomRight: Radius.circular(10.5.r),
                   ),
                 ),
                 child: Center(
-                  child: Text('In Progress',style: jost600(
-                      10.56.sp,
-                      AppColors.darkGrey,
-                  ),
+                  child: Text(
+                    'In Progress',
+                    style: jost600(10.56.sp, AppColors.darkGrey),
                   ),
                 ),
               ),
-              /// plumbing
+              // Plumbing Container
               Container(
                 height: 21.h,
                 width: 108.w,
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(239, 239, 239, 1),
                   borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(10.5.r,),
-                    bottomLeft: Radius.circular(10.5.r,),
+                    topRight: Radius.circular(10.5.r),
+                    bottomLeft: Radius.circular(10.5.r),
                   ),
                 ),
                 child: Center(
-                  child: Text('Plumbing',style: jost600(
-                      10.56.sp,
-                      AppColors.darkGrey,
-                  ),
+                  child: Text(
+                    title, // Display dynamic title here
+                    style: jost600(10.56.sp, AppColors.darkGrey),
                   ),
                 ),
               ),
@@ -92,58 +96,47 @@ class BookingCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 name,
-                                style:
-                                jost600(18.sp, AppColors.secondary),
+                                style: jost600(18.sp, AppColors.secondary),
                               ),
                               Text(
-                                "ID #2145",
-                                style:
-                                jost600(12.sp, AppColors.secondary),
+                                "ID #$taskId", // Display task ID here
+                                style: jost600(12.sp, AppColors.secondary),
                               ),
                             ],
                           ),
                           SizedBox(height: 4.h),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Image.asset(
-                                AppImages.pinlocation, // Replace with your pin location icon path
+                                AppImages.pinlocation,
                                 height: 12.h,
                                 width: 8.w,
                               ),
-                              SizedBox(width: 7.w,),
+                              SizedBox(width: 7.w),
                               Text(
                                 location,
                                 style: jost400(11.sp, AppColors.buttontext),
                               ),
-
                             ],
                           ),
-                          SizedBox(height: 5.h,),
+                          SizedBox(height: 5.h),
                           DescriptionWidget(),
-                          SizedBox(
-                            height: 5.h,
-                          ),
+                          SizedBox(height: 5.h),
                           Container(
                             padding: EdgeInsets.all(7.w),
                             decoration: BoxDecoration(
-                                color: AppColors.secondary,
-                                borderRadius:
-                                BorderRadius.circular(10.r)),
+                              color: AppColors.secondary,
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
                             child: Text(
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              'Price: 60.00 AED',
-
+                              'Price: $price AED', // Display price here
                               style: jost400(12.sp, AppColors.primary),
                             ),
                           ),
-
                         ],
                       ),
                     ),
@@ -161,7 +154,6 @@ class BookingCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    /// Date and Time Container
                     Container(
                       height: 35.h,
                       width: 195.w,
@@ -177,7 +169,7 @@ class BookingCard extends StatelessWidget {
                             Row(
                               children: [
                                 Image.asset(
-                                  AppImages.calendericon, // Replace with your calendar icon path
+                                  AppImages.calendericon,
                                   height: 14.46.h,
                                   width: 14.46.w,
                                 ),
@@ -191,7 +183,7 @@ class BookingCard extends StatelessWidget {
                             Row(
                               children: [
                                 Image.asset(
-                                  AppImages.clockicon, // Replace with your clock icon path
+                                  AppImages.clockicon,
                                   height: 14.46.h,
                                   width: 14.46.w,
                                 ),
@@ -206,10 +198,9 @@ class BookingCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    /// View Container
                     GestureDetector(
                       onTap: () {
-                        Get.to(TaskDescriptionHome(comingFrom: "booking",));
+                        Get.to(TaskDescriptionHome(comingFrom: "booking"));
                       },
                       child: Container(
                         height: 35.h,

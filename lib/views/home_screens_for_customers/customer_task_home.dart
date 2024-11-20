@@ -265,65 +265,105 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Upload Picture/Video"),
+                            // Text("Upload Picture/Video"),
                             Obx(() {
                               final imageFile = serviceController.imageFile.value;
-                              return imageFile == null
-                                  ? InkWell(
-                                onTap: serviceController.pickImageFromGallery,
-                                child: Container(
-                                  height: 30.h,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 5.w, vertical: 6.h),
-                                  decoration: BoxDecoration(
-                                      color: AppColors.primary,
-                                      borderRadius:
-                                      BorderRadius.circular(8.w)),
-                                  alignment: Alignment.center,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset(AppImages.upload,
-                                          height: 18.h, width: 18.w),
-                                      SizedBox(
-                                        width: 8.w,
+                              final videoFile = serviceController.videoFile.value;
+                              return Row(
+                                children: [
+                                  imageFile == null
+                                      ? InkWell(
+                                    onTap: serviceController.pickImageFromGallery,
+                                    child: Container(
+                                      height: 30.h,
+                                      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
+                                      decoration: BoxDecoration(
+                                          color: AppColors.primary,
+                                          borderRadius: BorderRadius.circular(8.w)),
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Image.asset(AppImages.upload, height: 18.h, width: 18.w),
+                                          SizedBox(width: 8.w),
+                                          Text("Upload Image", style: sora600(10.sp, AppColors.secondary))
+                                        ],
                                       ),
-                                      Text(
-                                        "Upload    ",
-                                        style:
-                                        sora600(10.sp, AppColors.secondary),
-                                      )
-                                    ],
+                                    ),
+                                  )
+                                      : GestureDetector(
+                                    onTap: serviceController.removeImage,
+                                    child: Icon(Icons.close, color: Colors.red),
                                   ),
-                                ),
-                              )
-                                  : GestureDetector(
-                                onTap: serviceController.removeImage,
-                                child: Icon(Icons.close, color: Colors.red),
+                                  SizedBox(width: 10.w),
+                                  videoFile == null
+                                      ? InkWell(
+                                    onTap: serviceController.pickVideoFromGallery,
+                                    child: Container(
+                                      height: 30.h,
+                                      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
+                                      decoration: BoxDecoration(
+                                          color: AppColors.primary,
+                                          borderRadius: BorderRadius.circular(8.w)),
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.video_collection, size: 18.h, color: Colors.white),
+                                          SizedBox(width: 8.w),
+                                          Text("Upload Video", style: sora600(10.sp, AppColors.secondary))
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                      : GestureDetector(
+                                    onTap: serviceController.removeVideo,
+                                    child: Icon(Icons.close, color: Colors.red),
+                                  ),
+                                ],
                               );
                             }),
                           ],
                         ),
                         Obx(() {
                           final imageFile = serviceController.imageFile.value;
-                          return imageFile != null
-                              ? Container(
-                            margin: EdgeInsets.only(top: 15.h),
-                            height: 100.h,
-                            width: 100.w,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: FileImage(imageFile),
-                                fit: BoxFit.cover,
+                          final videoFile = serviceController.videoFile.value;
+                          if (imageFile != null) {
+                            return Container(
+                              margin: EdgeInsets.only(top: 15.h),
+                              height: 100.h,
+                              width: 100.w,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: FileImage(imageFile),
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.circular(8.r),
                               ),
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                          )
-                              : Center(
-                            child: Text(
-                              'No Image Selected',
-                              style: jost400(12.sp, const Color(0xff6B7280)),
-                              textAlign: TextAlign.center,
+                            );
+                          } else if (videoFile != null) {
+                            return Container(
+                              margin: EdgeInsets.only(top: 15.h),
+                              height: 100.h,
+                              width: 100.w,
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Center(
+                                child: Icon(Icons.video_collection, size: 40.h, color: Colors.white),
+                              ),
+                            );
+                          }
+                          return Center(
+
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                'No Image/Video Selected',
+                                style: jost400(12.sp, const Color(0xff6B7280)),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           );
                         }),
@@ -560,7 +600,7 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Record Voice Note',
+                          'Record Voice Note              ',
                           style: TextStyle(fontSize: 14.sp, color: Colors.black),
                         ),
                         Obx(() => IconButton(
@@ -594,39 +634,46 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12.0.w),
-                    child: CustomElevatedButton(
-                      text: "Next",
-                      onPressed: () async {
-                        // Ensure an image is selected before attempting to save
-                        if (serviceController.imageFile.value == null) {
-                          Get.snackbar(
-                            "Error",
-                            "Please select an image before proceeding.",
-                            snackPosition: SnackPosition.BOTTOM,
-                          );
-                          return;
-                        }
+                    child: Obx(() {
+                      return CustomElevatedButton(
+                        text: serviceController.isLoading.value ? "" : "Next", // Show text when not loading
+                        onPressed: () async {
+                          // Check if an image or video is selected before proceeding
+                          if (serviceController.imageFile.value == null && serviceController.videoFile.value == null) {
+                            Get.snackbar(
+                              "Error",
+                              "Please select an image or video before proceeding.",
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
+                            return;
+                          }
 
-                        // Save data before navigating
-                        final isSuccess = await serviceController.saveDataToCollection(
-                          title: widget.service!,  // Title being passed to saveDataToCollection
-                          imageFile: serviceController.imageFile.value, // Pass the imageFile here
-                        );
+                          // Set isLoading to true to start the spinner
+                          serviceController.isLoading.value = true;
 
-                        if (isSuccess) {
-                          // Navigate to the next screen if save is successful
-                          Get.to(SearchOfferScreen(field: widget.service!));
-                        } else {
-                          // Show an error if save failed
-                          Get.snackbar(
-                            "Error",
-                            "Failed to save data. Please try again.",
-                            snackPosition: SnackPosition.BOTTOM,
+                          // Save data before navigating
+                          final isSuccess = await serviceController.saveDataToCollection(
+                            title: widget.service!,
+                            imageFile: serviceController.imageFile.value,
+                            videoFile: serviceController.videoFile.value,
                           );
-                        }
-                      },
-                      fontSize: 19.sp,
-                    ),
+
+                          // Set isLoading to false after saving is done
+                          serviceController.isLoading.value = false;
+
+                          if (isSuccess) {
+                            Get.to(SearchOfferScreen(field: widget.service!));
+                          } else {
+                            Get.snackbar(
+                              "Error",
+                              "Failed to save data. Please try again.",
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
+                          }
+                        },
+                        fontSize: 19.sp,
+                      );
+                    }),
                   ),
                   SizedBox(
                     height: 40.h,

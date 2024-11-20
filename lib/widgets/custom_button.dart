@@ -6,47 +6,50 @@ import 'package:repairoo/const/color.dart';
 class CustomElevatedButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
-  final double? width; // Optional width
-  final double? height; // Optional height
-  final double? fontSize; // Optional height
-  final Color? backgroundColor; // Optional background color
-  final double? borderRadius; // Optional background color
-  final Color? textColor; // Optional text color
-  final BorderSide? borderSide; // Optional border side
+  final double? width;
+  final double? height;
+  final double? fontSize;
+  final Color? backgroundColor;
+  final double? borderRadius;
+  final Color? textColor;
+  final BorderSide? borderSide;
 
   CustomElevatedButton({
     required this.text,
     required this.onPressed,
-    this.width, // Add width
-    this.height, // Add height
-    this.backgroundColor, // Add background color
-    this.textColor, // Add text color
-    this.borderSide,
+    this.width,
+    this.height,
     this.fontSize,
-    this.borderRadius, // Add border side
+    this.backgroundColor,
+    this.textColor,
+    this.borderSide,
+    this.borderRadius,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor ?? AppColors.primary, // Use backgroundColor or default color
+        backgroundColor: backgroundColor ?? AppColors.primary, // Default or provided background color
         shape: RoundedRectangleBorder(
-          side: borderSide ?? BorderSide(color: Colors.black, width: 1), // Use borderSide or default
+          side: borderSide ?? BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(borderRadius ?? 13.31.r), // Border radius
         ),
-        minimumSize: Size(width ?? double.infinity, height ?? 51.h), // Use width and height or default values
+        minimumSize: Size(width ?? double.infinity, height ?? 51.h), // Use width and height or default
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 16.h),
-        child: Text(
+        child: text.isEmpty // Show spinner when text is empty
+            ? CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white), // White spinner color
+        )
+            : Text(
           text,
           style: GoogleFonts.jost(
             fontWeight: FontWeight.w500,
-            color: textColor ?? AppColors.buttontext, // Use textColor or default text color
-            fontSize: fontSize ?? 19.sp, // Text size
+            color: textColor ?? AppColors.buttontext, // Default text color
+            fontSize: fontSize ?? 19.sp, // Default text size
           ),
         ),
       ),

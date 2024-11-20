@@ -1,63 +1,63 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart'; // For formatting date and time
 import 'package:repairoo/const/color.dart';
 import 'package:repairoo/const/images.dart';
 import 'package:repairoo/const/text_styles.dart';
-import 'today_screen_widgets/today_screen_booking_card.dart';
+import 'package:repairoo/views/booking_screens/today_screen_widgets/today_screen_booking_card.dart';
+import 'package:repairoo/views/home_screen_for_tech/task_description_home.dart';
 
 class TodayContent extends StatelessWidget {
   TodayContent({Key? key}) : super(key: key);
 
-  // Define a list of data for the containers
-  final List<Map<String, String>> bookingData = [
-
-  ];
-
-
-  Future<List<Map<String, String>>> fetchBookingData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      print('User not authenticated');
-      return [];
-    }
-    final userId = user.uid;
-    final bookingsRef = FirebaseFirestore.instance.collection('bookings').doc(userId);
-    final snapshot = await bookingsRef.get();
-
-    final bookings = snapshot.data()?['bookings'] as List<dynamic>?;
-    if (bookings != null) {
-      return List<Map<String, String>>.from(
-        bookings.map((booking) => Map<String, String>.from(booking)),
-      );
-    } else {
-      return [];
-    }
+  // Method to format Firestore Timestamp into readable DateTime string
+  String formatTimestamp(Timestamp timestamp) {
+    final date = timestamp.toDate(); // Convert Timestamp to DateTime
+    final dateFormat = DateFormat('yyyy-MM-dd hh:mm a'); // Format as desired
+    return dateFormat.format(date); // Return formatted string
   }
 
   @override
   Widget build(BuildContext context) {
-    // First, store the data to Firestore when the widget is built
-
     return Scaffold(
       backgroundColor: AppColors.secondary,
-      body: FutureBuilder<List<Map<String, String>>>(
-        future: fetchBookingData(),  // Fetch data from Firestore
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('booking').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Something went wrong!'));
           }
 
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No booking data available'));
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text('No bookings available.'));
           }
 
-          final bookingData = snapshot.data!;
+          final bookingData = snapshot.data!.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>; // Cast to a map
+            return {
+              'name': data['vendorName'] ?? 'Unknown Vendor',
+              'location': 'Multan, Pakistan', // Static location value
+              'description': 'description',
+              'date': data.containsKey('date') && data['date'] is Timestamp
+                  ? formatTimestamp(data['date'])
+                  : 'Mon, Dec 23', // Safe handling for missing or invalid 'date'
+              'time': data['time'] ?? '12:00',
+              'image': data['image'] ?? AppImages.plumbing, // Fallback image
+              'price': data['bidAmount'] ?? 'N/A', // Default price
+              'taskId': data['taskId'] ?? 'N/A',
+              'title': data['title'] ?? 'N/A',
+            };
+          }).toList();
+
+
+
+
+
           return ListView.builder(
             shrinkWrap: true,
             itemCount: bookingData.length,
@@ -68,11 +68,16 @@ class TodayContent extends StatelessWidget {
                 child: BookingCard(
                   name: booking['name']!,
                   location: booking['location']!,
-                  description: booking['description']!,
+                  description: booking['description']!, // This will always have a fallback value
                   date: booking['date']!,
                   time: booking['time']!,
                   imagePath: booking['image']!,
-                ),
+                  price: booking['price']!,
+                  taskId: booking['taskId']!,
+                  title: booking['title']!, // Pass title here
+
+                )
+
               );
             },
           );

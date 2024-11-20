@@ -297,6 +297,7 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+
                     GestureDetector(
                       onTap: () async {
                         // Fetch the current user's UID from FirebaseAuth
@@ -315,63 +316,51 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                         }
 
                         try {
-                          // Query the 'tasks' collection to get the bidderId
+                          // Query the 'bids' collection to get all bids
                           final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-                              .collection('tasks')
-                              .where('userUid', isEqualTo: currentUserId)
+                              .collection('bids')
                               .get();
 
+                          print("Query Snapshot: ${querySnapshot.docs.length} documents found"); // Debugging: Print how many documents are returned
+
                           if (querySnapshot.docs.isEmpty) {
-                            Get.snackbar("Error", "No tasks found for the current user.");
+                            Get.snackbar("Error", "No bids found.");
                             return;
                           }
 
-                          String? matchingBidderId;
-
-                          // Loop through the matching documents to find the bidderId
+                          // Loop through the documents and store data to the 'booking' collection
                           for (var doc in querySnapshot.docs) {
                             final data = doc.data() as Map<String, dynamic>;
+                            print("Bid Data: $data");  // Debug: Print the data for checking
 
-                            // Search for bidderId in each key that contains a list
-                            for (var entry in data.entries) {
-                              if (entry.value is List) {
-                                final List<dynamic> bids = entry.value;
+                            // Store the bid data in the 'booking' collection
+                            await FirebaseFirestore.instance.collection('booking').add({
+                              'bidAmount': data['bidAmount'] ?? bidAmount,  // Default to widget price if no bidAmount in bid
+                              'customerUid': currentUserId,
+                              'vendorName': data['vendorName'] ?? widget.name,
+                              'vendorRating': data['vendorRating'] ?? widget.rating,
+                              'vendorExperience': data['vendorExperience'] ?? widget.experience,
+                              'vendorReviews': data['vendorReviews'] ?? widget.reviews,
+                              'timestamp': FieldValue.serverTimestamp(),
+                              'bidderId': data['bidderId'] ?? '',  // Ensure bidderId is present
+                              'taskId': data['taskId'] ?? '',  // Store taskId from bid document
+                              'title': data['title'] ?? '',  // Store title from bid document
+                              'firstName': data['firstName'] ?? '',  // Store firstName from bid document
+                            });
 
-                                for (var bid in bids) {
-                                  if (bid is Map<String, dynamic> && bid.containsKey('bidderId')) {
-                                    matchingBidderId = bid['bidderId'];
-                                    break;
-                                  }
-                                }
-                              }
-
-                              // Break the loop if a matching bidderId is found
-                              if (matchingBidderId != null) break;
-                            }
-
-                            // Stop if a matching bidderId is found
-                            if (matchingBidderId != null) break;
+                            // Debugging: Print confirmation for each stored document
+                            print("Stored bid data in booking collection: ${data['bidderId']}");
                           }
 
-                          if (matchingBidderId == null) {
-                            Get.snackbar("Error", "No bidderId found for the current user.");
-                            return;
+                          // After storing all data in 'booking', you can proceed to remove the bid from the 'bids' collection
+                          final String? bidDocId = querySnapshot.docs.first.id;
+                          if (bidDocId != null) {
+                            await FirebaseFirestore.instance.collection('bids').doc(bidDocId).delete();
+                            print("Bid removed successfully from 'bids' collection");
                           }
 
-                          // Store data to the 'accepted_bid' collection
-                          await FirebaseFirestore.instance.collection('JobAccepted').add({
-                            'bidAmount': bidAmount,
-                            'customerUid': currentUserId,  // Store current user's UID as the customerUid
-                            'vendorName': widget.name,  // Vendor's name from widget
-                            'vendorRating': widget.rating,  // Vendor's rating
-                            'vendorExperience': widget.experience,  // Vendor's experience
-                            'vendorReviews': widget.reviews,  // Vendor's reviews
-                            'timestamp': FieldValue.serverTimestamp(),  // Timestamp for when the bid is placed
-                            'bidderId': matchingBidderId,  // Store the fetched bidderId
-                          });
-
-                          // Show a GetX Snackbar before opening the bottom sheet
-                          Get.snackbar("Success", "Job Accepted successfully!",
+                          // Show success message and open the bottom sheet after storing the bid data
+                          Get.snackbar("Success", "Job Completed successfully!",
                               snackPosition: SnackPosition.TOP, backgroundColor: Colors.green, colorText: Colors.white);
 
                           // Open the bottom sheet after storing the bid data
@@ -385,7 +374,8 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                             ),
                           );
                         } catch (e) {
-                          Get.snackbar("Error", "Failed to accept bid: $e");
+                          print("Error occurred: $e");
+                          Get.snackbar("Error", "Failed to complete job: $e");
                         }
                       },
                       child: Container(
@@ -398,11 +388,12 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          "Accept",
+                          "Complete",
                           style: jost600(22.sp, AppColors.secondary),
                         ),
                       ),
                     ),
+
                     GestureDetector(
                       onTap: (){
                         Get.bottomSheet(
@@ -412,6 +403,7 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                           CustomerrBidBottomSheet(comingFrom: "customer",),
                         );
                       },
+
                       child: Container(
                         width: 149.w,
                         height: 56.h,

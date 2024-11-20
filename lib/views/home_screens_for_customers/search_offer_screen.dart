@@ -22,45 +22,27 @@ class SearchOfferScreen extends StatefulWidget {
 }
 
 class _SearchOfferScreenState extends State<SearchOfferScreen> {
-  Stream<List<Map<String, dynamic>>> fetchOffersStream() async* {
-    final String currentUserUid = FirebaseAuth.instance.currentUser?.uid ?? "";
-
-    try {
-      final QuerySnapshot taskSnapshot = await FirebaseFirestore.instance
-          .collection('tasks')
-          .where('userUid', isEqualTo: currentUserUid)
-          .get();
-
-      if (taskSnapshot.docs.isNotEmpty) {
-        final docRef = taskSnapshot.docs.first.reference;
-
-        yield* docRef.snapshots().map((doc) {
-          // Safely cast the data to a Map<String, dynamic>
-          final data = doc.data() as Map<String, dynamic>?;
-
-          // Extract 'TV Mounting' bids if available
-          final List<dynamic> bids = data?['TV Mounting'] ?? [];
-
-          // Map the bids into the desired format
-          return bids.map((bid) {
-            return {
-              "image": AppImages.natalie_hales, // Example static image
-              "name": "Bidder", // Example name
-              "experience": "Bidder's experience details", // Example experience
-              "rating": "4", // Static rating
-              "price": bid['bid']?.toString() ?? "N/A", // Use bid amount or fallback
-              "reviews": "0", // Static reviews
-            };
-          }).toList();
-        });
-      } else {
-        yield [];
-        Get.snackbar("Error", "No tasks found for the user.");
-      }
-    } catch (e) {
-      Get.snackbar("Error", "Failed to fetch offers: $e");
-      yield [];
-    }
+  Stream<List<Map<String, dynamic>>> fetchOffersStream(String taskId) {
+    print('Fetching offers for taskId: $taskId');
+    return FirebaseFirestore.instance
+        .collection('bids')
+        .where('title', isEqualTo: widget.field.capitalize) // Filter by taskId
+        .snapshots()
+        .map((snapshot) {
+      print('Snapshot received: ${snapshot.docs.length} docs');
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        print('Bid data: $data');
+        return {
+          'image': AppImages.natalie_hales, // Example static image
+          'name': data['firstName'] ?? "Bidder", // Using bidder's first name
+          'experience': "Bidder's experience details", // Example experience
+          'rating': "4", // Static rating (adjust as needed)
+          'price': data['bidAmount']?.toString() ?? "N/A", // Using bid amount
+          'reviews': "0", // Static reviews (adjust as needed)
+        };
+      }).toList();
+    });
   }
 
   @override
@@ -79,7 +61,7 @@ class _SearchOfferScreenState extends State<SearchOfferScreen> {
       ),
       body: SafeArea(
         child: StreamBuilder<List<Map<String, dynamic>>>(
-          stream: fetchOffersStream(),
+          stream: fetchOffersStream(widget.field), // Pass the field as taskId
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
@@ -108,9 +90,9 @@ class _SearchOfferScreenState extends State<SearchOfferScreen> {
               );
             }
 
-            final dummy = snapshot.data ?? [];
+            final offers = snapshot.data ?? [];
 
-            return dummy.isEmpty
+            return offers.isEmpty
                 ? Center(
               child: Text(
                 "No offers found for your selected service.",
@@ -154,7 +136,7 @@ class _SearchOfferScreenState extends State<SearchOfferScreen> {
                                 Icons.keyboard_arrow_down,
                                 size: 20.w,
                                 color: AppColors.secondary,
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -165,18 +147,18 @@ class _SearchOfferScreenState extends State<SearchOfferScreen> {
                       shrinkWrap: true,
                       padding: EdgeInsets.zero,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: dummy.length,
+                      itemCount: offers.length,
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: EdgeInsets.only(
                               top: index != 0 ? 10.0.w : 0),
                           child: OfferContainer(
-                            image: dummy[index]['image'],
-                            name: dummy[index]['name'],
-                            experience: dummy[index]['experience'],
-                            price: dummy[index]['price'],
-                            rating: dummy[index]['rating'],
-                            reviews: dummy[index]['reviews'],
+                            image: offers[index]['image'],
+                            name: offers[index]['name'],
+                            experience: offers[index]['experience'],
+                            price: offers[index]['price'],
+                            rating: offers[index]['rating'],
+                            reviews: offers[index]['reviews'],
                           ),
                         );
                       },
