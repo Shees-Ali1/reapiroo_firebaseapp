@@ -124,7 +124,7 @@ class _BookingScreenMainState extends State<BookingScreenMain> {
 
   List<DropdownMenuItem<String>> _getDropdownItems(String userRole) {
     // Return different items based on the user role
-   if (userRole == "Customer") {
+    if (userRole == "Customer") {
       return [
         DropdownMenuItem(
           value: 'All',

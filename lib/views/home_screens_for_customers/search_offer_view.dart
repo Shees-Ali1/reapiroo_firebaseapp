@@ -210,85 +210,85 @@ class _SearchOfferViewState extends State<SearchOfferView> {
 
               Container(
                 padding: EdgeInsets.only(
-                    left: 13.47.w,
-                    right: 13.47.w,
-                    top: 11.97.h,
+                  left: 13.47.w,
+                  right: 13.47.w,
+                  top: 11.97.h,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.containerLightGrey,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    width: 1,
-                    color: AppColors.textFieldGrey
-                  )
+                    color: AppColors.containerLightGrey,
+                    borderRadius: BorderRadius.circular(16.r),
+                    border: Border.all(
+                        width: 1,
+                        color: AppColors.textFieldGrey
+                    )
                 ),
                 child: Column(children: reviewsData[selectedRating]!.map((review) {
-                                    return Padding(
-                                      padding:  EdgeInsets.only(bottom: 17.0.h),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              CircleAvatar(
-                                                radius: 20.w,
-                                                backgroundImage: AssetImage("assets/images/review_coments_image.png"), // Correct usage with AssetImage
-                                              ),
+                  return Padding(
+                    padding:  EdgeInsets.only(bottom: 17.0.h),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 20.w,
+                              backgroundImage: AssetImage("assets/images/review_coments_image.png"), // Correct usage with AssetImage
+                            ),
 
-                                              SizedBox(width: 10.w),
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    review['name']!,
-                                                    style: jost700(13.23.sp, AppColors.primary,),
-                                                  ),
-                                                  SizedBox(height: 5.h),
-                                                  Row(
-                                                    children: [
-                                                      Row(
-                                                        children: List.generate(
-                                                          5,
-                                                              (index) => Padding(
-                                                            padding: EdgeInsets.symmetric(horizontal: 0.w), // Adjust right padding as needed
-                                                            child: Image.asset(
-                                                              index < int.parse(selectedRating[0])
-                                                                  ? AppImages.star_yellow  // Example: solid star icon
-                                                                  : AppImages.star_grey,
-                                                              height: 15.12.h,
-                                                              width: 15.12.w,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-
-                                                      SizedBox(width: 8.w),
-                                                      Text(
-                                                        review['date']!,
-                                                        style: jost600(
-                                                            12.sp,
-                                                            AppColors.primary,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 10.h),
-                                          Text(
-                                            review['comment']!,
-                                            style: jost500(
-                                              13.sp,
-                                              AppColors.primary,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
+                            SizedBox(width: 10.w),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  review['name']!,
+                                  style: jost700(13.23.sp, AppColors.primary,),
                                 ),
+                                SizedBox(height: 5.h),
+                                Row(
+                                  children: [
+                                    Row(
+                                      children: List.generate(
+                                        5,
+                                            (index) => Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 0.w), // Adjust right padding as needed
+                                          child: Image.asset(
+                                            index < int.parse(selectedRating[0])
+                                                ? AppImages.star_yellow  // Example: solid star icon
+                                                : AppImages.star_grey,
+                                            height: 15.12.h,
+                                            width: 15.12.w,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    SizedBox(width: 8.w),
+                                    Text(
+                                      review['date']!,
+                                      style: jost600(
+                                        12.sp,
+                                        AppColors.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10.h),
+                        Text(
+                          review['comment']!,
+                          style: jost500(
+                            13.sp,
+                            AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                ),
               ),
               SizedBox(height: 16.h,),
               Padding(
@@ -412,7 +412,7 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                           border: Border.all(
                               color: AppColors.secondary
                           ),
-                           color: Color(0xffDDDDDD),
+                          color: Color(0xffDDDDDD),
                         ),
                         alignment: Alignment.center,
                         child: Text("Bid", style: jost600(22.sp, AppColors.primary),

@@ -64,19 +64,19 @@ class TodayContent extends StatelessWidget {
             itemBuilder: (context, index) {
               final booking = bookingData[index];
               return Padding(
-                padding: EdgeInsets.only(bottom: index != bookingData.length - 1 ? 12.h : 0),
-                child: BookingCard(
-                  name: booking['name']!,
-                  location: booking['location']!,
-                  description: booking['description']!, // This will always have a fallback value
-                  date: booking['date']!,
-                  time: booking['time']!,
-                  imagePath: booking['image']!,
-                  price: booking['price']!,
-                  taskId: booking['taskId']!,
-                  title: booking['title']!, // Pass title here
+                  padding: EdgeInsets.only(bottom: index != bookingData.length - 1 ? 12.h : 0),
+                  child: BookingCard(
+                    name: booking['name']!,
+                    location: booking['location']!,
+                    description: booking['description']!, // This will always have a fallback value
+                    date: booking['date']!,
+                    time: booking['time']!,
+                    imagePath: booking['image']!,
+                    price: booking['price']!,
+                    taskId: booking['taskId']!,
+                    title: booking['title']!, // Pass title here
 
-                )
+                  )
 
               );
             },

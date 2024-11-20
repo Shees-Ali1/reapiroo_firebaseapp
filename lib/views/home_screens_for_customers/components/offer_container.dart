@@ -46,8 +46,8 @@ class _OfferContainerState extends State<OfferContainer> {
             height: 100.h,
             margin: EdgeInsets.only(right: 9.w),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.w),
-              image: DecorationImage(image: AssetImage(widget.image), fit: BoxFit.cover)
+                borderRadius: BorderRadius.circular(12.w),
+                image: DecorationImage(image: AssetImage(widget.image), fit: BoxFit.cover)
             ),
           ),
           Expanded(child: Column(
@@ -80,10 +80,10 @@ class _OfferContainerState extends State<OfferContainer> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   RichText(text: TextSpan(
-                    children: [
-                      TextSpan(text: widget.price, style: jost600(24.sp, AppColors.secondary)),
-                      TextSpan(text: "AED",style: jost(13.sp, AppColors.lightGrey, FontWeight.w300))
-                    ]
+                      children: [
+                        TextSpan(text: widget.price, style: jost600(24.sp, AppColors.secondary)),
+                        TextSpan(text: "AED",style: jost(13.sp, AppColors.lightGrey, FontWeight.w300))
+                      ]
                   )),
                   SizedBox(
                     child: Row(
@@ -91,7 +91,7 @@ class _OfferContainerState extends State<OfferContainer> {
                         GestureDetector(
                           onTap: (){
                             Get.to(SearchOfferView(
-                              skills: ["Plumbing", "Cleaning", "Electrical", "Painting", "HVAC"],
+                                skills: ["Plumbing", "Cleaning", "Electrical", "Painting", "HVAC"],
                                 name: widget.name,
                                 image: widget.image,
                                 experience: widget.experience,
@@ -113,30 +113,30 @@ class _OfferContainerState extends State<OfferContainer> {
                             ),
                           ),
                         ),
-      GestureDetector(
-        onTap: () {
-          Get.bottomSheet(
-            isScrollControlled: true,
-            isDismissible: true,
-            enableDrag: true,
-            const CustomerrBidBottomSheet(comingFrom: "customer"),
-          );
-        },
-        child: Container(
-          width: 60.w,
-          height: 27.h,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8.w),
-            border: Border.all(color: AppColors.secondary, width: 1),
-            color: const Color(0xffDDDDDD),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            "Bid",
-            style: jost500(13.sp, AppColors.primary),
-          ),
-        ),
-      )                      ],
+                        GestureDetector(
+                          onTap: () {
+                            Get.bottomSheet(
+                              isScrollControlled: true,
+                              isDismissible: true,
+                              enableDrag: true,
+                              const CustomerrBidBottomSheet(comingFrom: "customer"),
+                            );
+                          },
+                          child: Container(
+                            width: 60.w,
+                            height: 27.h,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8.w),
+                              border: Border.all(color: AppColors.secondary, width: 1),
+                              color: const Color(0xffDDDDDD),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Bid",
+                              style: jost500(13.sp, AppColors.primary),
+                            ),
+                          ),
+                        )                      ],
                     ),
                   )
                 ],
