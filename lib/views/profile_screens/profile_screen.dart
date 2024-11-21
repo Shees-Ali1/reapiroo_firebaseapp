@@ -10,8 +10,10 @@ import 'package:repairoo/controllers/user_controller.dart';
 import 'package:repairoo/views/auth/signup_view/role_screen.dart';
 import 'package:repairoo/views/customer_wallet_screen/wallet_screen.dart';
 import 'package:repairoo/views/notification_screen/notification_screen.dart';
+import 'package:repairoo/views/policies%20screens/Refund%20policy.dart';
 import 'package:repairoo/views/profile_screens/bio_and_experience/bio_and_experience_main.dart';
 import 'package:repairoo/views/profile_screens/edit_profile_screen.dart';
+import 'package:repairoo/views/profile_screens/privacy_policy/privacy_policy.dart';
 import 'package:repairoo/views/profile_screens/reports/reports_screen.dart';
 import 'package:repairoo/views/profile_screens/reviews/reviews_screen.dart';
 import 'package:repairoo/widgets/app_bars.dart';
@@ -19,6 +21,7 @@ import 'package:repairoo/widgets/profile_button_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 
+import '../policies screens/terms and conditions.dart';
 import '../tech_wallet/wallet_screen.dart';
 import 'support_screen/support_screen.dart';
 
@@ -178,9 +181,58 @@ class _EditProfileScreenState extends State<ProfileScreen> {
                       label: "Reviews",
                       iconPath: AppImages.star_icon,
                     ),
+              SizedBox(height: 10.h),
+
+              userVM.userRole.value == "Customer"
+                  ? ProfileButton(
+                onPressed: () {
+                  Get.to(RefundPolicy());
+                },
+                label: "Refund Policy",
+                iconPath: AppImages.policy,
+              )
+                  : ProfileButton(
+                onPressed: () {
+                  Get.to(ReviewsScreen());
+                },
+                label: "Refund Policy",
+                iconPath: AppImages.policy,
+              ),
+              SizedBox(height: 10.h),
+
+              userVM.userRole.value == "Customer"
+                  ? ProfileButton(
+                onPressed: () {
+                  Get.to(TermsCondition());
+                },
+                label: "Terms And Condition",
+                iconPath: AppImages.policy,
+              )
+                  : ProfileButton(
+                onPressed: () {
+                  Get.to(ReviewsScreen());
+                },
+                label: "Terms And Condition",
+                iconPath: AppImages.policy,
+              ),
 
               SizedBox(height: 10.h),
 
+              userVM.userRole.value == "Customer"
+                  ? ProfileButton(
+                onPressed: () {
+                  Get.to(PrivacyPolicy());
+                },
+                label: "Privacy Policy",
+                iconPath: AppImages.policy,
+              )
+                  : ProfileButton(
+                onPressed: () {
+                  Get.to(ReviewsScreen());
+                },
+                label: "Privacy Policy",
+                iconPath: AppImages.policy,
+              ),
               // /// Terms/Policy
               // ProfileButton(
               //   onPressed: () {
@@ -190,6 +242,7 @@ class _EditProfileScreenState extends State<ProfileScreen> {
               //   iconPath: AppImages.privacyicon,
               // ),
               // SizedBox(height: 10.h),
+              SizedBox(height: 10.h),
 
               /// Help/Contact Us
               userVM.userRole.value == "Customer"

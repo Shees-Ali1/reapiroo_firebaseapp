@@ -22,7 +22,7 @@ class NotificationScreen extends StatelessWidget {
       // Get the document from your Firestore collection
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
           .collection('techNotifications')
-          .doc('C7ZnkOSybwnqiabkOoEW') // Document ID
+          .doc('hlcH2Vy5E8pBgBzkaaBj') // Document ID
           .get();
 
       // Extract the required fields if document exists

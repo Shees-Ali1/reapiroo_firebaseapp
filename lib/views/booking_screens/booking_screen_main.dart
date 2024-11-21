@@ -61,7 +61,8 @@ class _BookingScreenMainState extends State<BookingScreenMain> {
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(8.83.r),
                   ),
-                  child: DropdownButton<String>(
+                  child:
+                  DropdownButton<String>(
                     value: selectedOption,
                     dropdownColor: AppColors.secondary, // Yellow background for dropdown items
                     hint: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
