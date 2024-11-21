@@ -10,6 +10,8 @@ import 'package:repairoo/views/home_screens_for_customers/search_offer_view.dart
 import 'package:repairoo/widgets/custom_button.dart';
 import 'package:repairoo/widgets/my_svg.dart';
 
+import '../../customerbidnotify.dart';
+
 class OfferContainer extends StatefulWidget {
   const OfferContainer({super.key, required this.image, required this.name, required this.experience, required this.price, required this.rating, required this.reviews});
 

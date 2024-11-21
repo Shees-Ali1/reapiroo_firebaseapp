@@ -16,6 +16,7 @@ import 'package:repairoo/views/profile_screens/profile_screen.dart';
 import '../../const/images.dart';
 import '../../controllers/nav_bar_controller.dart';
 import '../../widgets/drawer.dart';
+import '../home_screen_for_tech/bookingscreenyech.dart';
 import '../home_screens_for_customers/customer_main_home.dart';
 
 class AppNavBar extends StatefulWidget {
@@ -101,8 +102,8 @@ class _AppNavBarState extends State<AppNavBar> {
     // Move bottomBarPages into build method to ensure userVM is accessible
     List<Widget> bottomBarPages = [
       userRole == "Tech" ? HomeScreen() : CustomerMainHome(),
+      userRole == "Tech" ? bookingTech() : BookingScreenMain(),
       // if (userVM.userRole.value != "Customer") OrderScreen(),
-      const BookingScreenMain(),
       const ChatsScreenMain(),
       const ProfileScreen(),
     ];

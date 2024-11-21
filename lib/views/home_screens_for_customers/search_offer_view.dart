@@ -11,6 +11,8 @@ import 'package:repairoo/views/home_screen_for_tech/components/bid_bottom_sheet.
 import 'package:repairoo/views/home_screens_for_customers/components/job_accepted_bottomsheet.dart';
 import 'package:repairoo/widgets/app_bars.dart';
 
+import '../customerbidnotify.dart';
+
 class SearchOfferView extends StatefulWidget {
   const SearchOfferView({super.key, required this.name, required this.image, required this.experience, required this.price, required this.rating, required this.reviews, required this.skills});
 
@@ -360,8 +362,6 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                           }
 
                           // Show success message and open the bottom sheet after storing the bid data
-                          Get.snackbar("Success", "Job Completed successfully!",
-                              snackPosition: SnackPosition.TOP, backgroundColor: Colors.green, colorText: Colors.white);
 
                           // Open the bottom sheet after storing the bid data
                           Get.bottomSheet(
@@ -388,7 +388,7 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          "Complete",
+                          "Accept",
                           style: jost600(22.sp, AppColors.secondary),
                         ),
                       ),

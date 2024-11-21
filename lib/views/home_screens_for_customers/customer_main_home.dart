@@ -21,6 +21,7 @@ import '../../controllers/top services controller.dart';
 import '../../widgets/custom_container.dart';
 import '../home_screen_for_tech/components/announcement_containers.dart';
 import 'components/slider_image.dart';
+import 'notificationcustomer.dart';
 
 class CustomerMainHome extends StatefulWidget {
   const CustomerMainHome({super.key});
@@ -43,7 +44,7 @@ class _CustomerMainHomeState extends State<CustomerMainHome> {
       child: Scaffold(
         appBar: MyAppBar(
           onNotificationTap: () {
-            Get.to(NotificationScreen());
+            Get.to(NotificationScreencustomer());
           },
           onMenuTap: () {
             navBarController.openDrawer(context);

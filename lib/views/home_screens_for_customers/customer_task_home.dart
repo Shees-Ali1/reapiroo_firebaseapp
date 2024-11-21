@@ -250,88 +250,169 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                         border: Border.all(color: const Color(0xffE2E2E2), width: 1),
                         borderRadius: BorderRadius.circular(8.r),
                       ),
-                      child: Column(
+                      child:
+                      Column(
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // Text("Upload Picture/Video"),
+                              // Reactive widget for handling images
                               Obx(() {
-                                final imageFile = serviceController.imageFile.value;
-                                final videoFile = serviceController.videoFile.value;
-                                return Row(
-                                  children: [
-                                    imageFile == null
-                                        ? InkWell(
-                                      onTap: serviceController.pickImageFromGallery,
-                                      child: Container(
-                                        height: 30.h,
-                                        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
-                                        decoration: BoxDecoration(
-                                            color: AppColors.primary,
-                                            borderRadius: BorderRadius.circular(8.w)),
-                                        alignment: Alignment.center,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Image.asset(AppImages.upload, height: 18.h, width: 18.w),
-                                            SizedBox(width: 8.w),
-                                            Text("Upload Image", style: sora600(10.sp, AppColors.secondary))
-                                          ],
-                                        ),
+                                if (serviceController.images.isEmpty) {
+                                  return InkWell(
+                                    onTap: serviceController.pickImagesFromGallery,
+                                    child: Container(
+                                      height: 30.h,
+                                      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary,
+                                        borderRadius: BorderRadius.circular(8.w),
                                       ),
-                                    )
-                                        : GestureDetector(
-                                      onTap: serviceController.removeImage,
-                                      child: Icon(Icons.close, color: Colors.red),
-                                    ),
-                                    SizedBox(width: 10.w),
-                                    videoFile == null
-                                        ? InkWell(
-                                      onTap: serviceController.pickVideoFromGallery,
-                                      child: Container(
-                                        height: 30.h,
-                                        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
-                                        decoration: BoxDecoration(
-                                            color: AppColors.primary,
-                                            borderRadius: BorderRadius.circular(8.w)),
-                                        alignment: Alignment.center,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Icon(Icons.video_collection, size: 18.h, color: Colors.white),
-                                            SizedBox(width: 8.w),
-                                            Text("Upload Video", style: sora600(10.sp, AppColors.secondary))
-                                          ],
-                                        ),
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Image.asset(AppImages.upload, height: 18.h, width: 18.w),
+                                          SizedBox(width: 8.w),
+                                          Text("Upload Image", style: sora600(10.sp, AppColors.secondary)),
+                                        ],
                                       ),
-                                    )
-                                        : GestureDetector(
-                                      onTap: serviceController.removeVideo,
-                                      child: Icon(Icons.close, color: Colors.red),
                                     ),
-                                  ],
-                                );
+                                  );
+                                } else {
+                                  return Wrap(
+                                    spacing: 8.w,
+                                    children: serviceController.images.map((image) {
+                                      return GestureDetector(
+                                        onTap: () => serviceController.removeImage(image),
+                                        child: Container(
+                                          height: 30.h,
+                                          width: 30.w,
+                                          decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                              image: FileImage(image),
+                                              fit: BoxFit.cover,
+                                            ),
+                                            borderRadius: BorderRadius.circular(4.r),
+                                          ),
+                                          child: Icon(Icons.close, color: Colors.red, size: 16.sp),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                }
+                              }),
+                              SizedBox(width: 10.w),
+                              // Reactive widget for handling videos
+                              Obx(() {
+                                if (serviceController.videos.isEmpty) {
+                                  return InkWell(
+                                    onTap: serviceController.pickVideosFromGallery,
+                                    child: Container(
+                                      height: 30.h,
+                                      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary,
+                                        borderRadius: BorderRadius.circular(8.w),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.video_collection, size: 18.h, color: Colors.white),
+                                          SizedBox(width: 8.w),
+                                          Text("Upload Video", style: sora600(10.sp, AppColors.secondary)),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return Wrap(
+                                    spacing: 8.w,
+                                    children: serviceController.videos.map((video) {
+                                      return GestureDetector(
+                                        onTap: () => serviceController.removeVideo(video),
+                                        child: Container(
+                                          height: 30.h,
+                                          width: 30.w,
+                                          decoration: BoxDecoration(
+                                            color: Colors.black,
+                                            borderRadius: BorderRadius.circular(4.r),
+                                          ),
+                                          child: Icon(Icons.close, color: Colors.red, size: 16.sp),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                }
                               }),
                             ],
                           ),
+                          SizedBox(height: 10.h,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Button for capturing a photo
+                              InkWell(
+                                onTap: serviceController.takePhoto,
+                                child: Container(
+                                  height: 30.h,
+                                  padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.circular(8.w),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Icon(Icons.camera_alt, color: Colors.white, size: 18.h),
+                                      SizedBox(width: 8.w),
+                                      Text("Take Photo", style: sora600(10.sp, AppColors.secondary)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10.w),
+                              // Button for recording a video
+                              InkWell(
+                                onTap: serviceController.recordVideo,
+                                child: Container(
+                                  height: 30.h,
+                                  padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.circular(8.w),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Icon(Icons.videocam, color: Colors.white, size: 18.h),
+                                      SizedBox(width: 8.w),
+                                      Text("Record Video", style: sora600(10.sp, AppColors.secondary)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                           Obx(() {
-                            final imageFile = serviceController.imageFile.value;
-                            final videoFile = serviceController.videoFile.value;
-                            if (imageFile != null) {
+                            // Display a preview of the first image or video, if available
+                            if (serviceController.images.isNotEmpty) {
                               return Container(
                                 margin: EdgeInsets.only(top: 15.h),
                                 height: 100.h,
                                 width: 100.w,
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
-                                    image: FileImage(imageFile),
+                                    image: FileImage(serviceController.images.first),
                                     fit: BoxFit.cover,
                                   ),
                                   borderRadius: BorderRadius.circular(8.r),
                                 ),
                               );
-                            } else if (videoFile != null) {
+                            } else if (serviceController.videos.isNotEmpty) {
                               return Container(
                                 margin: EdgeInsets.only(top: 15.h),
                                 height: 100.h,
@@ -346,7 +427,6 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                               );
                             }
                             return Center(
-
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 10.0),
                                 child: Text(
@@ -358,7 +438,148 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                             );
                           }),
                         ],
-                      ),
+                      )
+
+                      // Column(
+                      //   children: [
+                      //     Row(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children: [
+                      //         Obx(() {
+                      //           return Row(
+                      //             children: [
+                      //               // For images
+                      //               if (serviceController.images.isEmpty)
+                      //                 InkWell(
+                      //                   onTap: serviceController.pickImagesFromGallery,
+                      //                   child: Container(
+                      //                     height: 30.h,
+                      //                     padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
+                      //                     decoration: BoxDecoration(
+                      //                       color: AppColors.primary,
+                      //                       borderRadius: BorderRadius.circular(8.w),
+                      //                     ),
+                      //                     alignment: Alignment.center,
+                      //                     child: Row(
+                      //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //                       children: [
+                      //                         Image.asset(AppImages.upload, height: 18.h, width: 18.w),
+                      //                         SizedBox(width: 8.w),
+                      //                         Text("Upload Image", style: sora600(10.sp, AppColors.secondary)),
+                      //                       ],
+                      //                     ),
+                      //                   ),
+                      //                 )
+                      //               else
+                      //                 Stack(
+                      //                   children: serviceController.images.map((image) {
+                      //                     return GestureDetector(
+                      //                       onTap: () => serviceController.removeImage(image),
+                      //                       child: Container(
+                      //                         margin: EdgeInsets.only(right: 10.w),
+                      //                         height: 30.h,
+                      //                         width: 30.w,
+                      //                         decoration: BoxDecoration(
+                      //                           image: DecorationImage(
+                      //                             image: FileImage(image),
+                      //                             fit: BoxFit.cover,
+                      //                           ),
+                      //                           borderRadius: BorderRadius.circular(4.r),
+                      //                         ),
+                      //                         child: Icon(Icons.close, color: Colors.red, size: 16.sp),
+                      //                       ),
+                      //                     );
+                      //                   }).toList(),
+                      //                 ),
+                      //               SizedBox(width: 10.w),
+                      //               // For videos
+                      //               if (serviceController.videos.isEmpty)
+                      //                 InkWell(
+                      //                   onTap: serviceController.pickVideosFromGallery,
+                      //                   child: Container(
+                      //                     height: 30.h,
+                      //                     padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
+                      //                     decoration: BoxDecoration(
+                      //                       color: AppColors.primary,
+                      //                       borderRadius: BorderRadius.circular(8.w),
+                      //                     ),
+                      //                     alignment: Alignment.center,
+                      //                     child: Row(
+                      //                       mainAxisAlignment: MainAxisAlignment.center,
+                      //                       children: [
+                      //                         Icon(Icons.video_collection, size: 18.h, color: Colors.white),
+                      //                         SizedBox(width: 8.w),
+                      //                         Text("Upload Video", style: sora600(10.sp, AppColors.secondary)),
+                      //                       ],
+                      //                     ),
+                      //                   ),
+                      //                 )
+                      //               else
+                      //                 Stack(
+                      //                   children: serviceController.videos.map((video) {
+                      //                     return GestureDetector(
+                      //                       onTap: () => serviceController.removeVideo(video),
+                      //                       child: Container(
+                      //                         margin: EdgeInsets.only(right: 10.w),
+                      //                         height: 30.h,
+                      //                         width: 30.w,
+                      //                         decoration: BoxDecoration(
+                      //                           color: Colors.black,
+                      //                           borderRadius: BorderRadius.circular(4.r),
+                      //                         ),
+                      //                         child: Icon(Icons.close, color: Colors.red, size: 16.sp),
+                      //                       ),
+                      //                     );
+                      //                   }).toList(),
+                      //                 ),
+                      //             ],
+                      //           );
+                      //         }),
+                      //       ],
+                      //     ),
+                      //
+                      //     Obx(() {
+                      //       // Display a preview of the first image or video, if available
+                      //       if (serviceController.images.isNotEmpty) {
+                      //         return Container(
+                      //           margin: EdgeInsets.only(top: 15.h),
+                      //           height: 100.h,
+                      //           width: 100.w,
+                      //           decoration: BoxDecoration(
+                      //             image: DecorationImage(
+                      //               image: FileImage(serviceController.images.first),
+                      //               fit: BoxFit.cover,
+                      //             ),
+                      //             borderRadius: BorderRadius.circular(8.r),
+                      //           ),
+                      //         );
+                      //       } else if (serviceController.videos.isNotEmpty) {
+                      //         return Container(
+                      //           margin: EdgeInsets.only(top: 15.h),
+                      //           height: 100.h,
+                      //           width: 100.w,
+                      //           decoration: BoxDecoration(
+                      //             color: Colors.black,
+                      //             borderRadius: BorderRadius.circular(8.r),
+                      //           ),
+                      //           child: Center(
+                      //             child: Icon(Icons.video_collection, size: 40.h, color: Colors.white),
+                      //           ),
+                      //         );
+                      //       }
+                      //       return Center(
+                      //         child: Padding(
+                      //           padding: const EdgeInsets.only(top: 10.0),
+                      //           child: Text(
+                      //             'No Image/Video Selected',
+                      //             style: jost400(12.sp, const Color(0xff6B7280)),
+                      //             textAlign: TextAlign.center,
+                      //           ),
+                      //         ),
+                      //       );
+                      //     }),
+                      //   ],
+                      // )
                     ),
                     Container(
                       height: 55.h,
@@ -376,7 +597,7 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                           Text("Select location"),
                           Container(
                               height: 30.h,
-                              width: 100.w,  // Adjust width to fit text input and button
+                              width: 150.w,  // Adjust width to fit text input and button
                               child:
                               TextField(
                                 onChanged: (value) {
@@ -386,6 +607,8 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.only(left: 15.w, bottom: 0.h),
                                   hintText: 'Enter Location',
+                                  hintStyle: TextStyle(color: AppColors.buttonGrey),
+
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8.w),
                                     borderSide: BorderSide(color: Color(0xffE2E2E2), width: 1),
@@ -586,31 +809,68 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                         border: Border.all(color: Color(0xffE2E2E2), width: 1),
                         borderRadius: BorderRadius.circular(8.r),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Record Voice Note              ',
-                            style: TextStyle(fontSize: 14.sp, color: Colors.black),
-                          ),
-                          Obx(() => IconButton(
-                            icon: Icon(
-                              serviceController.isRecording.value ? Icons.stop : Icons.mic,
-                            ),
-                            onPressed: serviceController.isRecording.value
-                                ? serviceController.stopRecording
-                                : serviceController.recordVoiceNote,
-                            color: serviceController.isRecording.value ? Colors.red : Colors.black,
-                          )),
-                          Obx(() => serviceController.isRecording.value
-                              ? CircularProgressIndicator(
-                            value: serviceController.progressValue.value,
-                            strokeWidth: 2,
-                          )
-                              : Container()),
-                        ],
-                      ),
+                      child: Obx(() {
+                        if (serviceController.isRecording.value) {
+                          // Recording State
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Recording... ${serviceController.recordingDuration.value}s",
+                                style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                              ),
+                              CircularProgressIndicator(
+                                value: serviceController.progressValue.value,
+                                strokeWidth: 2,
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.stop, color: Colors.red),
+                                onPressed: serviceController.stopRecording,
+                              ),
+                            ],
+                          );
+                        } else if (serviceController.voiceNoteUrl.value != null) {
+                          // Recorded Voice Note State
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Voice Note Recorded",
+                                style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.play_arrow, color: Colors.green),
+                                    onPressed: serviceController.playVoiceNote,
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: serviceController.deleteVoiceNote,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        } else {
+                          // Default State
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Record Voice Note",
+                                style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.mic, color: Colors.black),
+                                onPressed: serviceController.recordVoiceNote,
+                              ),
+                            ],
+                          );
+                        }
+                      }),
                     ),
+
                     CustomInputField(
                       maxLines: 4,
                       controller: task,
@@ -628,31 +888,33 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                         return CustomElevatedButton(
                           text: serviceController.isLoading.value ? "" : "Next", // Show text when not loading
                           onPressed: () async {
-                            // Check if an image or video is selected before proceeding
-                            if (serviceController.imageFile.value == null && serviceController.videoFile.value == null) {
+                            // Check if at least one image or video is selected
+                            if (serviceController.images.isEmpty && serviceController.videos.isEmpty) {
                               Get.snackbar(
                                 "Error",
-                                "Please select an image or video before proceeding.",
+                                "Please select at least one image or video before proceeding.",
                                 snackPosition: SnackPosition.BOTTOM,
                               );
                               return;
                             }
 
-                            // Set isLoading to true to start the spinner
+                            // Set isLoading to true to show the loading indicator
                             serviceController.isLoading.value = true;
 
                             // Save data before navigating
                             final isSuccess = await serviceController.saveDataToCollection(
-                              title: widget.service!,
-                              imageFile: serviceController.imageFile.value,
-                              videoFile: serviceController.videoFile.value,
+                              title: widget.service!, // Replace with your actual service title
+                              selectedDateTime: DateTime.now(), // Pass the selected date or use the current time
+                              imageFiles: serviceController.images, // Pass the list of selected images
+                              videoFiles: serviceController.videos, // Pass the list of selected videos
                             );
 
-                            // Set isLoading to false after saving is done
+                            // Reset isLoading after the operation
                             serviceController.isLoading.value = false;
 
+                            // Navigate on success or show error message
                             if (isSuccess) {
-                              Get.to(SearchOfferScreen(field: widget.service!));
+                              Get.to(SearchOfferScreen(field: widget.service!)); // Replace with your actual screen navigation
                             } else {
                               Get.snackbar(
                                 "Error",

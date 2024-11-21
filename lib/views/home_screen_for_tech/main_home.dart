@@ -23,6 +23,7 @@ import 'package:repairoo/widgets/my_svg.dart';
 
 import '../home_screens_for_customers/components/slider_image.dart';
 import '../tech_wallet/wallet_screen.dart';
+import 'new_task_home.dart';
 class TaskModel {
   final String userId;
   final String taskDescription;
@@ -41,7 +42,7 @@ class TaskModel {
   factory TaskModel.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
     return TaskModel(
-      userId: data['userId'] ?? '',
+      userId: data['userUid'] ?? '',
       taskDescription: data['taskDescription'] ?? '',
       imageUrl: data['imageUrl'],
       randomId: data['randomId'] ?? '',
@@ -167,7 +168,7 @@ class _MainHomeState extends State<MainHome> {
                       color: AppColors.containerLightGrey,
                       borderRadius: BorderRadius.circular(12.w),
                       border:
-                          Border.all(width: 1, color: AppColors.textFieldGrey)),
+                      Border.all(width: 1, color: AppColors.textFieldGrey)),
                   alignment: Alignment.center,
                   child: GestureDetector(
                     onTap: () {
@@ -253,14 +254,14 @@ class _MainHomeState extends State<MainHome> {
                               SizedBox(
                                 height: 28,
                                 child: Obx(
-                                  () => Switch(
+                                      () => Switch(
                                     value: userVM.availability.value,
                                     onChanged: (val) {
                                       userVM.availability.value = val;
                                     },
                                     activeColor: AppColors.switchGreen,
                                     activeTrackColor:
-                                        AppColors.switchGreen.withOpacity(.30),
+                                    AppColors.switchGreen.withOpacity(.30),
                                     inactiveThumbColor: Colors.grey,
                                     inactiveTrackColor: Colors.grey.shade300,
                                   ),
@@ -439,7 +440,7 @@ class _MainHomeState extends State<MainHome> {
                   child: Obx(() {
                     if (userVM.availability.value) {
                       return StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance.collection('tasks').snapshots(), // Fetch all documents
+                        stream: FirebaseFirestore.instance.collection('tasks').snapshots(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return Center(child: CircularProgressIndicator());
@@ -461,10 +462,16 @@ class _MainHomeState extends State<MainHome> {
                           List<Map<String, dynamic>> allTasks = [];
                           for (var doc in snapshot.data!.docs) {
                             var taskData = doc.data() as Map<String, dynamic>;
+                            String userUid = taskData['userUid'] ?? '';
+
                             taskData.forEach((key, value) {
                               if (key != "userUid" && value is List) {
                                 for (var task in value) {
-                                  allTasks.add({...task, "title": key});
+                                  allTasks.add({
+                                    ...task,
+                                    "title": key,
+                                    "userUid": userUid, // Include the userUid for each task
+                                  });
                                 }
                               }
                             });
@@ -541,7 +548,7 @@ class _MainHomeState extends State<MainHome> {
                                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
                                                         Text(
-                                                          task['name'] ?? "Jared Hughs", // Example dynamic field
+                                                          task['userName'] ?? "Jared Hughs", // Example dynamic field
                                                           style: jost600(18.sp, AppColors.secondary),
                                                         ),
                                                         Text(
@@ -574,8 +581,7 @@ class _MainHomeState extends State<MainHome> {
                                                         borderRadius: BorderRadius.circular(12.r),
                                                       ),
                                                       child: Text(
-                                                        task['taskDescription'] ??
-                                                            "No description available.",
+                                                        task['taskDescription'] ?? "No description available.",
                                                         style: GoogleFonts.montserrat(
                                                           fontSize: 9.sp,
                                                           fontWeight: FontWeight.w500,
@@ -584,23 +590,39 @@ class _MainHomeState extends State<MainHome> {
                                                         ),
                                                       ),
                                                     ),
+                                                    SizedBox(height: 6.h),
+
                                                   ],
                                                 ),
                                               ),
                                               SizedBox(width: 20.w),
-                                              Container(
-                                                height: 82.h,
-                                                width: 92.w,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(12.r),
-                                                  image: DecorationImage(
-                                                    image: task['imageUrl'] != null
-                                                        ? NetworkImage(task['imageUrl'])
-                                                        : AssetImage(AppImages.jared_hughs),
-                                                    fit: BoxFit.contain,
-                                                  ),
-                                                ),
-                                              )
+                              Container(
+                              height: 82.h,
+                              width: 92.w,
+                              decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: task['imageUrls'] != null && task['imageUrls'] is List && task['imageUrls'].isNotEmpty
+                              ? ClipRRect(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: PageView.builder(
+                              itemCount: task['imageUrls'].length,
+                              itemBuilder: (context, index) {
+                              return Image.network(
+                              task['imageUrls'][index],
+                              fit: BoxFit.contain,
+                              );
+                              },
+                              ),
+                              )
+                                  : ClipRRect(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: Image.asset(
+                              AppImages.jared_hughs,
+                              fit: BoxFit.contain,
+                              ),
+                              ),
+                              )
                                             ],
                                           ),
                                         ),
@@ -627,11 +649,9 @@ class _MainHomeState extends State<MainHome> {
                                                           SizedBox(width: 8.w),
                                                           Text(
                                                             task['selectedDateTime'] != null
-                                                                ? _formatDate(
-                                                                task['selectedDateTime'])
+                                                                ? _formatDate(task['selectedDateTime'])
                                                                 : "No Date Available",
-                                                            style: montserrat600(
-                                                                11.sp, AppColors.darkGrey),
+                                                            style: montserrat600(11.sp, AppColors.darkGrey),
                                                           ),
                                                         ],
                                                       ),
@@ -644,11 +664,9 @@ class _MainHomeState extends State<MainHome> {
                                                           SizedBox(width: 8.w),
                                                           Text(
                                                             task['selectedDateTime'] != null
-                                                                ? _formatTime(
-                                                                task['selectedDateTime'])
+                                                                ? _formatTime(task['selectedDateTime'])
                                                                 : "--:--",
-                                                            style: montserrat600(
-                                                                11.sp, AppColors.darkGrey),
+                                                            style: montserrat600(11.sp, AppColors.darkGrey),
                                                           ),
                                                         ],
                                                       ),
@@ -660,8 +678,9 @@ class _MainHomeState extends State<MainHome> {
                                               Expanded(
                                                 child: GestureDetector(
                                                   onTap: () {
-                                                    Get.to(TaskDescriptionHome(
-                                                        comingFrom: "tech"));
+                                                    Get.to(NewTaskHome(
+                                                      taskData: allTasks[index],
+                                                    ));
                                                   },
                                                   child: Container(
                                                     height: 35.h,
@@ -708,8 +727,9 @@ class _MainHomeState extends State<MainHome> {
                         ],
                       );
                     }
-                  })
+                  }),
                 ),
+
                 SizedBox(
                   height: 16.h,
                 ),
@@ -717,200 +737,6 @@ class _MainHomeState extends State<MainHome> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-class TaskContainer extends StatelessWidget {
-  final Map<String, dynamic> taskData;
-
-  TaskContainer({required this.taskData});
-
-  @override
-  Widget build(BuildContext context) {
-    String? dateTimeString = taskData['selectedDateTime'];
-
-    // Check if the date is null, provide a default value
-    String formattedDate = dateTimeString != null ? dateTimeString : "Date not available";
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: Colors.transparent,
-          width: 0,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                height: 21.h,
-                width: 108.w,
-                decoration: BoxDecoration(
-                  color: AppColors.containerLightGrey,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10.5.r),
-                    bottomRight: Radius.circular(10.5.r),
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  "New",
-                  style: montserrat600(11.sp, AppColors.primary),
-                ),
-              ),
-              Container(
-                height: 21.h,
-                width: 108.w,
-                decoration: BoxDecoration(
-                  color: AppColors.containerLightGrey,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(10.5.r),
-                    bottomLeft: Radius.circular(10.5.r),
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  taskData['title'] ?? "Unknown",
-                  style: montserrat600(11.sp, AppColors.primary),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 7.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            taskData['taskDescription'] ?? "No description",
-                            style: jost600(18.sp, AppColors.secondary),
-                          ),
-                          Text(
-                            "ID #${taskData['randomId'] ?? '0000'}",
-                            style: jost600(12.sp, AppColors.secondary),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 6.h),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset(
-                            AppImages.pinlocation,
-                            width: 15.w,
-                            height: 15.h,
-                          ),
-                          SizedBox(width: 3.w),
-                          Text(
-                            taskData['location'] ?? "Unknown Location",
-                            style: montserrat400(11.sp, AppColors.secondary),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 6.h),
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary,
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: Text(
-                          taskData['taskDescription'] ??
-                              "No task description available.",
-                          style: GoogleFonts.montserrat(
-                            fontSize: 9.sp,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.primary,
-                            height: 1,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 20.w),
-                Container(
-                  height: 82.h,
-                  width: 92.w,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.r),
-                    image: DecorationImage(
-                      image: taskData['imageUrl'] != null
-                          ? NetworkImage(taskData['imageUrl']
-                      )
-                          :NetworkImage(taskData['imageUrl']
-                      ),
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 9.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  height: 35.h,
-                  padding: EdgeInsets.symmetric(horizontal: 8.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Row(
-                    children: [
-                      MySvg(assetName: AppSvgs.calender),
-                      SizedBox(width: 8.w),
-                      Text(
-                          formattedDate,
-                        style: montserrat600(11.sp, AppColors.darkGrey),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 15.w),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.to(TaskDescriptionHome(comingFrom: "tech"));
-                    },
-                    child: Container(
-                      height: 35.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        "View",
-                        style: jost600(13.sp, AppColors.primary),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10.h),
-        ],
       ),
     );
   }

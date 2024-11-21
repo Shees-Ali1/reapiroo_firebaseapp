@@ -60,11 +60,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBUe-oHkpXBhDYpuLCVsRXPsIJx_pdxOPo',
-    appId: '1:624738259232:ios:bb544a03a200621c36c745',
+    appId: '1:624738259232:ios:d00f3f32f6121a9b36c745',
     messagingSenderId: '624738259232',
     projectId: 'reapairoo',
     storageBucket: 'reapairoo.firebasestorage.app',
-    iosBundleId: 'com.example.repairoo',
+    iosBundleId: 'com.example.reapirooFirebaseapp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(

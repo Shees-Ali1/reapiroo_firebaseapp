@@ -34,6 +34,7 @@ class BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("imagePath");
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -200,7 +201,7 @@ class BookingCard extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Get.to(TaskDescriptionHome(comingFrom: "booking"));
+                        Get.to(TaskDescriptionHome(comingFrom: "booking", taskData: {},));
                       },
                       child: Container(
                         height: 35.h,
