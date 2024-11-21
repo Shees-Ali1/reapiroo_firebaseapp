@@ -168,7 +168,7 @@ class _MainHomeState extends State<MainHome> {
                       color: AppColors.containerLightGrey,
                       borderRadius: BorderRadius.circular(12.w),
                       border:
-                          Border.all(width: 1, color: AppColors.textFieldGrey)),
+                      Border.all(width: 1, color: AppColors.textFieldGrey)),
                   alignment: Alignment.center,
                   child: GestureDetector(
                     onTap: () {
@@ -254,14 +254,14 @@ class _MainHomeState extends State<MainHome> {
                               SizedBox(
                                 height: 28,
                                 child: Obx(
-                                  () => Switch(
+                                      () => Switch(
                                     value: userVM.availability.value,
                                     onChanged: (val) {
                                       userVM.availability.value = val;
                                     },
                                     activeColor: AppColors.switchGreen,
                                     activeTrackColor:
-                                        AppColors.switchGreen.withOpacity(.30),
+                                    AppColors.switchGreen.withOpacity(.30),
                                     inactiveThumbColor: Colors.grey,
                                     inactiveTrackColor: Colors.grey.shade300,
                                   ),
@@ -596,19 +596,33 @@ class _MainHomeState extends State<MainHome> {
                                                 ),
                                               ),
                                               SizedBox(width: 20.w),
-                                              Container(
-                                                height: 82.h,
-                                                width: 92.w,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(12.r),
-                                                  image: DecorationImage(
-                                                    image: task['imageUrl'] != null
-                                                        ? NetworkImage(task['imageUrl'])
-                                                        : AssetImage(AppImages.jared_hughs),
-                                                    fit: BoxFit.contain,
-                                                  ),
-                                                ),
-                                              )
+                              Container(
+                              height: 82.h,
+                              width: 92.w,
+                              decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: task['imageUrls'] != null && task['imageUrls'] is List && task['imageUrls'].isNotEmpty
+                              ? ClipRRect(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: PageView.builder(
+                              itemCount: task['imageUrls'].length,
+                              itemBuilder: (context, index) {
+                              return Image.network(
+                              task['imageUrls'][index],
+                              fit: BoxFit.contain,
+                              );
+                              },
+                              ),
+                              )
+                                  : ClipRRect(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: Image.asset(
+                              AppImages.jared_hughs,
+                              fit: BoxFit.contain,
+                              ),
+                              ),
+                              )
                                             ],
                                           ),
                                         ),

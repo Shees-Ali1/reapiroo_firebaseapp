@@ -235,8 +235,13 @@ class _NewTaskHomeState extends State<NewTaskHome> {
     final String title = task['title'] ?? 'No Title';
     final String name = task['userName'] ?? 'No userName';
     final String id = task['randomId'] ?? 'No randomId';
+    final String voiceNoteUrl = task['voiceNoteUrl'] ?? 'No randomId';
     final String description = task['taskDescription'] ?? 'No Description';
-    final String? imageUrl = task['imageUrl'];
+    final String? imageUrl = (task['imageUrls'] is List && task['imageUrls'].isNotEmpty)
+        ? task['imageUrls'][0] as String
+        : null;
+    print('object$imageUrl');
+    print('voiceNoteUrl$voiceNoteUrl');
     final String location = task['location'] ?? 'Unknown Location';
     final DateTime dateTime = DateTime.parse(task['selectedDateTime']);
     // final String? currentUserUid = _auth.currentUser?.uid;
@@ -249,8 +254,11 @@ class _NewTaskHomeState extends State<NewTaskHome> {
     // final String location = widget.taskData['location'] ?? 'Unknown Location';
     // final DateTime dateTime = DateTime.parse(widget.taskData['dateTime']);
     // final String voiceNoteUrl = widget.taskData['voiceNoteUrl'] ?? 'No Voice Note';
-     final String userUid = task['userUid'] ?? 'No userUid';
-    final String videoUrl = task['videoUrl'] ?? 'No userUid';
+    final String userUid = task['userUid'] ?? 'No userUid';
+    final String videoUrl = (task['videoUrls'] is List && task['videoUrls'].isNotEmpty)
+        ? task['videoUrls'][0] as String
+        : 'No userUid';
+    print('objectvideo$videoUrl');
     String descriptionText =
         description;
     return Scaffold(
@@ -865,7 +873,7 @@ class _NewTaskHomeState extends State<NewTaskHome> {
 
 class VideoPlayerWidget extends StatefulWidget {
   final String videoUrl;
-  final String placeholderImage; // Image to show if no video URL is provided
+  final String placeholderImage;
 
   const VideoPlayerWidget({
     required this.videoUrl,
@@ -878,7 +886,7 @@ class VideoPlayerWidget extends StatefulWidget {
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  late VideoPlayerController? _controller;
+  VideoPlayerController? _controller;
   bool _isPlaying = false;
 
   @override
@@ -888,9 +896,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       _controller = VideoPlayerController.network(widget.videoUrl)
         ..initialize().then((_) {
           setState(() {}); // Refresh after initialization
+        }).catchError((error) {
+          debugPrint("Error initializing video player: $error");
         });
-    } else {
-      _controller = null; // No video
     }
   }
 
@@ -919,6 +927,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     if (_controller == null || !_controller!.value.isInitialized) {
       // Show the placeholder image if no video or not initialized
       return Stack(
+        alignment: Alignment.center,
         children: [
           Image.network(
             widget.placeholderImage,

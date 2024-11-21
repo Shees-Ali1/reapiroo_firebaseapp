@@ -210,7 +210,7 @@ class OrderBookingCard extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         Get.to(TaskDescriptionHome(
-                          comingFrom: "booking",
+                          comingFrom: "booking", taskData: {},
                         ));
                       },
                       child: Container(

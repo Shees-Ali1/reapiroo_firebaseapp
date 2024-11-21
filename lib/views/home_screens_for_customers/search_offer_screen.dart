@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:repairoo/const/color.dart';
 import 'package:repairoo/const/images.dart';
@@ -11,6 +12,7 @@ import 'package:repairoo/views/home_screen_for_tech/components/cancel_dialog_box
 import 'package:repairoo/views/home_screens_for_customers/components/offer_container.dart';
 import 'package:repairoo/widgets/app_bars.dart';
 import 'package:repairoo/widgets/custom_button.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class SearchOfferScreen extends StatefulWidget {
   const SearchOfferScreen({super.key, required this.field});
@@ -22,6 +24,21 @@ class SearchOfferScreen extends StatefulWidget {
 }
 
 class _SearchOfferScreenState extends State<SearchOfferScreen> {
+  late PageController _pageController;
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+
+    // Start auto-sliding every 5 seconds
+
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
   Stream<List<Map<String, dynamic>>> fetchOffersStream(String taskId) {
     print('Fetching offers for taskId: $taskId');
     return FirebaseFirestore.instance
@@ -94,10 +111,20 @@ class _SearchOfferScreenState extends State<SearchOfferScreen> {
 
             return offers.isEmpty
                 ? Center(
-              child: Text(
-                "No offers found for your selected service.",
-                style: jost400(16.sp, AppColors.primary),
-                textAlign: TextAlign.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SpinKitCircle(
+                    color: AppColors.primary,
+                    size: 100.0,
+                  ),
+                  SizedBox(height: 20.h),
+                  Text(
+                    "We're working on your requests and connecting you with the nearest Technicians. Please wait.",
+                    style: jost400(16.sp, AppColors.primary),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             )
                 : SingleChildScrollView(

@@ -109,36 +109,35 @@ class _MyAppBarState extends State<MyAppBar> {
               ),
             ),
           if (widget.isTextField == true && widget.isTitle == false)
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 13.w),
-                decoration: BoxDecoration(
-                  color: Colors.black, // Set the background color
-                  borderRadius: BorderRadius.circular(15.w), // Rounded edges
-                ),
-                child: Row(
-                  children: [
-                    MySvg(
-                      assetName: AppSvgs.search_icon,
-                      height: 19.2.h,
-                      width: 19.2.w,
-                    ),
-                    SizedBox(width: 10.w), // Space between the icon and the text field
-                    Expanded(
-                      child: TextField(
-                        cursorColor: AppColors.secondary,
-                        style: jost400(14.sp, AppColors.secondary),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 9.h),
-                          hintText: "Search for anything",
-                          hintStyle: jost400(14.sp, AppColors.secondary),
-                          border: InputBorder.none, // Remove the underline border
-                        ),
+            Container(
+              width: 190.w,
+              padding: EdgeInsets.symmetric(horizontal: 13.w),
+              decoration: BoxDecoration(
+                color: Colors.black, // Set the background color
+                borderRadius: BorderRadius.circular(15.w), // Rounded edges
+              ),
+              child: Row(
+                children: [
+                  MySvg(
+                    assetName: AppSvgs.search_icon,
+                    height: 19.2.h,
+                    width: 19.2.w,
+                  ),
+                  SizedBox(width: 10.w), // Space between the icon and the text field
+                  Expanded(
+                    child: TextField(
+                      cursorColor: AppColors.secondary,
+                      style: jost400(14.sp, AppColors.secondary),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 9.h),
+                        hintText: "Search for anything",
+                        hintStyle: jost400(14.sp, AppColors.secondary),
+                        border: InputBorder.none, // Remove the underline border
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
 

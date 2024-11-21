@@ -235,7 +235,6 @@ class _TaskDescriptionHomeState extends State<TaskDescriptionHome> {
     return DateFormat('MM/dd/yyyy hh:mm a').format(selectedDateTime!);
   }
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final TaskController taskController = Get.put(TaskController()); // Initialize TaskController
 
   @override
   Widget build(BuildContext context) {
@@ -286,7 +285,7 @@ class _TaskDescriptionHomeState extends State<TaskDescriptionHome> {
                   height: 16.h,
                 ),
                 Text(
-title,                  style: jost700(24.sp, AppColors.primary),
+                  title,                  style: jost700(24.sp, AppColors.primary),
                 ),
                 SizedBox(
                   height: 9.h,
@@ -303,7 +302,7 @@ title,                  style: jost700(24.sp, AppColors.primary),
                     Container(
                       height: 21.h,
                       padding:
-                          EdgeInsets.symmetric(vertical: 2, horizontal: 5.w),
+                      EdgeInsets.symmetric(vertical: 2, horizontal: 5.w),
                       // width: 108.w,
                       decoration: BoxDecoration(
                           color: AppColors.containerLightGrey,
@@ -336,16 +335,16 @@ title,                  style: jost700(24.sp, AppColors.primary),
                               return role == 'Tech'
                                   ?  SizedBox.shrink()
 
-                              : Text(
-                              "ID #2145",
-                              style: jost600(12.sp, AppColors.primary),
+                                  : Text(
+                                "ID #2145",
+                                style: jost600(12.sp, AppColors.primary),
                               );
                             },
                           ),
 
 
                           Text(
-title,
+                            title,
                             style: montserrat600(11.sp, AppColors.primary),
                           ),
                         ],
@@ -387,7 +386,7 @@ title,
                                       MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                    name,
+                                          name,
                                           style: jost600(
                                               18.sp, AppColors.secondary),
                                         ),
@@ -399,47 +398,47 @@ title,
                                       ],
                                     )
                                         : Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.start,
-                                    children: [
-                                    SizedBox(
-                                    height: 60.h,
-                                    width: 60.w,
-                                    child: Image.asset(
-                                    AppImages.saraprofile,
-                                    )),
-                                    SizedBox(
-                                    width: 10.w,
-                                    ),
-                                    Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    children: [
-                                    Text(
-                                    "Jared Hughs",
-                                    style: jost600(
-                                    18.sp, AppColors.secondary),
-                                    ),
-                                    Row(
-                                    children: [
-                                    SizedBox(
-                                    height: 18.h,
-                                    width: 18.w,
-                                    child: Image.asset(
-                                    AppImages.star)),
-                                    SizedBox(
-                                    width: 5.w,
-                                    ),
-                                    Text(
-                                    "4 (15)",
-                                    style: jost600(12.sp,
-                                    AppColors.secondary),
-                                    ),
-                                    ],
-                                    ),
-                                    ],
-                                    ),
-                                    ],
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                            height: 60.h,
+                                            width: 60.w,
+                                            child: Image.asset(
+                                              AppImages.saraprofile,
+                                            )),
+                                        SizedBox(
+                                          width: 10.w,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Jared Hughs",
+                                              style: jost600(
+                                                  18.sp, AppColors.secondary),
+                                            ),
+                                            Row(
+                                              children: [
+                                                SizedBox(
+                                                    height: 18.h,
+                                                    width: 18.w,
+                                                    child: Image.asset(
+                                                        AppImages.star)),
+                                                SizedBox(
+                                                  width: 5.w,
+                                                ),
+                                                Text(
+                                                  "4 (15)",
+                                                  style: jost600(12.sp,
+                                                      AppColors.secondary),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     );
                                   },
                                 ),
@@ -510,7 +509,7 @@ title,
                                     return role == 'Tech'
 
 
-                                    ?   SizedBox.shrink()
+                                        ?   SizedBox.shrink()
 
                                         :  Container(
                                       padding: EdgeInsets.all(7.w),
@@ -536,11 +535,11 @@ title,
                             height: 110.h,
                             width: 85.w,
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.w),
-                                image:DecorationImage(
-                                  image: NetworkImage(imageUrl!),
-                                  fit: BoxFit.cover,
-                                ),
+                              borderRadius: BorderRadius.circular(12.w),
+                              image:DecorationImage(
+                                image: NetworkImage(imageUrl!),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           )
                         ],
@@ -569,7 +568,7 @@ title,
                                       color: Colors.transparent, width: 0)),
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   SizedBox(
                                     child: Row(
@@ -608,33 +607,33 @@ title,
                           GestureDetector(
                             onTap: () {
 
-                                showDialog(
-                                  context: context,
-                                  barrierDismissible:
-                                      true, // Allows dialog dismissal on outside tap
-                                  builder: (BuildContext context) {
-                                    return Dialog(
-                                      backgroundColor: Colors.transparent,
-                                      insetPadding: EdgeInsets.all(16),
-                                      child: Center(
-                                        child: Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 16.w, vertical: 24.h),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(16.r),
-                                          ),
-                                          child: SparepartDialogueBox(),
+                              showDialog(
+                                context: context,
+                                barrierDismissible:
+                                true, // Allows dialog dismissal on outside tap
+                                builder: (BuildContext context) {
+                                  return Dialog(
+                                    backgroundColor: Colors.transparent,
+                                    insetPadding: EdgeInsets.all(16),
+                                    child: Center(
+                                      child: Container(
+                                        width:
+                                        MediaQuery.of(context).size.width,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 16.w, vertical: 24.h),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                          BorderRadius.circular(16.r),
                                         ),
+                                        child: SparepartDialogueBox(),
                                       ),
-                                    );
-                                  },
-                                );
+                                    ),
+                                  );
+                                },
+                              );
 
-                              },
+                            },
                             child:
                             FutureBuilder<DocumentSnapshot>(
                               future: _firestore.collection('tech_users').doc(currentUserUid).get(),
@@ -704,50 +703,50 @@ title,
                     ),
 
                     /// Video Player
-                  Stack(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 14.w),
-                        alignment: Alignment.center,
-                        height: 189.h,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                        ),
-                        clipBehavior: Clip.hardEdge,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12.r),
-                          child: AspectRatio(
-                            aspectRatio: 16 / 9,
-                            child:
-                            VideoPlayerWidget(
-                              videoUrl: videoUrl,
-                              placeholderImage:imageUrl, // Provide your asset image path
-                            ),
-
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 4.h,
-                        left: 14.w,
-                        child: Container(
-                          height: 28.h,
-                          width: 68.w,
-                          decoration: BoxDecoration(
-                              color: AppColors.containerLightGrey,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10.5.w),
-                                bottomRight: Radius.circular(10.5.w),
-                              )),
+                    Stack(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 14.w),
                           alignment: Alignment.center,
-                          child: Text(
-                            "Video",
-                            style: montserrat400(11.sp, AppColors.primary),
+                          height: 189.h,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child:
+                              VideoPlayerWidget(
+                                videoUrl: videoUrl,
+                                placeholderImage:imageUrl, // Provide your asset image path
+                              ),
+
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                        Positioned(
+                          top: 4.h,
+                          left: 14.w,
+                          child: Container(
+                            height: 28.h,
+                            width: 68.w,
+                            decoration: BoxDecoration(
+                                color: AppColors.containerLightGrey,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10.5.w),
+                                  bottomRight: Radius.circular(10.5.w),
+                                )),
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Video",
+                              style: montserrat400(11.sp, AppColors.primary),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
 
                     SizedBox(
                       height: 5.h,
@@ -808,7 +807,7 @@ title,
                                 final Uri phoneUri = Uri(
                                     scheme: 'tel',
                                     path:
-                                        '1234567890'); // Yahan apna phone number daalein
+                                    '1234567890'); // Yahan apna phone number daalein
                                 if (await canLaunchUrl(phoneUri)) {
                                   await launchUrl(phoneUri);
                                 } else {
@@ -896,51 +895,51 @@ title,
                         ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                      CustomElevatedButton(
-                      width: 160,
-                      height: 51,
-                      text: "Mark as done",
-                      backgroundColor: AppColors.primary,
-                      textColor: AppColors.secondary,
-                      fontSize: 19,
-                      onPressed: () async {
-                        final user = FirebaseAuth.instance.currentUser;
+                        CustomElevatedButton(
+                          width: 160,
+                          height: 51,
+                          text: "Mark as done",
+                          backgroundColor: AppColors.primary,
+                          textColor: AppColors.secondary,
+                          fontSize: 19,
+                          onPressed: () async {
+                            final user = FirebaseAuth.instance.currentUser;
 
-                        if (user != null) {
-                          final String uid = user.uid; // Current user's UID
+                            if (user != null) {
+                              final String uid = user.uid; // Current user's UID
 
-                          try {
-                            // Saving status to Firebase
-                            await FirebaseFirestore.instance.collection('status').add({
-                              'text': 'completed',
-                              'bidderId': uid,     // Current user's UID
-                              'customerId': uid,   // Same UID for this example
-                              'timestamp': FieldValue.serverTimestamp(), // Optional: time of update
-                            });
+                              try {
+                                // Saving status to Firebase
+                                await FirebaseFirestore.instance.collection('status').add({
+                                  'text': 'completed',
+                                  'bidderId': uid,     // Current user's UID
+                                  'customerId': uid,   // Same UID for this example
+                                  'timestamp': FieldValue.serverTimestamp(), // Optional: time of update
+                                });
 
-                            // Show success message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Status marked as completed!")),
-                            );
+                                // Show success message
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Status marked as completed!")),
+                                );
 
-                            // Navigate to the bookingTech page
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => bookingTech()),
-                            );
+                                // Navigate to the bookingTech page
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => bookingTech()),
+                                );
 
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Error saving status: $e")),
-                            );
-                          }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("User not logged in!")),
-                          );
-                        }
-                      },
-                    ),
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Error saving status: $e")),
+                                );
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("User not logged in!")),
+                              );
+                            }
+                          },
+                        ),
                         CustomElevatedButton(
                           width: 160.w,
                           height: 51.h,
@@ -969,7 +968,6 @@ title,
                           onPressed: () {
                             // Show message for rescheduling
                             final String userUid = task['userUid'] ?? 'No userUid';
-                            taskController.setUserUid(userUid);
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(

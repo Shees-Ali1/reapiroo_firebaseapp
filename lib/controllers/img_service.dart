@@ -28,26 +28,26 @@ class ImageService {
   }
 
   // Remove image or video
-  Future<void> removeMedia() async {
-    // Reset both image and video files to null
-    serviceController.imageFile.value = null;
-    serviceController.videoFile.value = null;
-  }
+  // Future<void> removeMedia() async {
+  //   // Reset both image and video files to null
+  //   serviceController.imageFile.value = null;
+  //   serviceController.videoFile.value = null;
+  // }
 
-  // Save data (image and/or video)
-  Future<void> saveData({
-    required String title,
-    required File? imageFile,
-    required File? videoFile,
-  }) async {
-    if (imageFile != null || videoFile != null) {
-      await serviceController.saveDataToCollection(
-        title: title,
-        imageFile: imageFile,
-        videoFile: videoFile,
-      );
-    } else {
-      Get.snackbar("Error", "Please select an image or video before saving.");
-    }
-  }
+  // // Save data (image and/or video)
+  // Future<void> saveData({
+  //   required String title,
+  //   required File? imageFile,
+  //   required File? videoFile,
+  // }) async {
+  //   if (imageFile != null || videoFile != null) {
+  //     await serviceController.saveDataToCollection(
+  //       title: title,
+  //       imageFile: imageFile,
+  //       videoFile: videoFile,
+  //     );
+  //   } else {
+  //     Get.snackbar("Error", "Please select an image or video before saving.");
+  //   }
+  // }
 }

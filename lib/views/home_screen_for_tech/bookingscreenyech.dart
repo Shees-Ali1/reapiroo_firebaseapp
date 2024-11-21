@@ -247,7 +247,7 @@ class _bookingTechState extends State<bookingTech> {
                 description: data['taskDescription'] ?? 'No Description',
                 date: data['selectedDateTime']?.split('T')[0] ?? 'No Date',
                 time: data['selectedDateTime']?.split('T')[1]?.split('.')[0] ?? 'No Time',
-                imagePath: data['imageUrl'] ?? '',
+                imagePath: data['imageUrl'] ?? 'https://firebasestorage.googleapis.com/v0/b/reapairoo.firebasestorage.app/o/services%2Fplum.png?alt=media&token=a7deb3f5-360e-4373-bef9-881895452369',
               ),
             );
           },
