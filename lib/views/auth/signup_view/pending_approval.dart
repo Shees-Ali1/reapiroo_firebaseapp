@@ -47,7 +47,7 @@ class PendingApproval extends StatelessWidget {
                 if (isAccountVerified()) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AppNavBar()),
+                    MaterialPageRoute(builder: (context) => AppNavBar(userRole: '',)),
                   );
                 } else {
                   showDialog(

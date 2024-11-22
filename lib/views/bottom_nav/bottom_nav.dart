@@ -20,7 +20,8 @@ import '../home_screen_for_tech/bookingscreenyech.dart';
 import '../home_screens_for_customers/customer_main_home.dart';
 
 class AppNavBar extends StatefulWidget {
-  const AppNavBar({super.key});
+  final String userRole;
+  AppNavBar({super.key, required this.userRole});
 
   @override
   State<AppNavBar> createState() => _AppNavBarState();

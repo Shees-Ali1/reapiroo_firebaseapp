@@ -17,7 +17,9 @@ class SignupController extends GetxController {
   RxString VerificationId = ''.obs;
 
   void updateGender(String? gender) {
-    selectedGender.value = gender ?? ''; // Update the selected gender
+    if (gender != null) {
+      selectedGender.value = gender;
+    }
   }
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -38,6 +40,36 @@ class SignupController extends GetxController {
 
     if (pickedFile != null) {
       imageFile.value = File(pickedFile.path); // Update reactively
+    }
+  }
+  Future<void> pickImageAndUpload(String userId) async {
+    try {
+      // isLoading.value = true; // Start loading
+      // Pick image from gallery
+      final ImagePicker picker = ImagePicker();
+      final XFile? pickedFile =
+      await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        // Update reactive variable with the selected file
+        imageFile.value = File(pickedFile.path);
+        // Prepare for Firebase Storage upload
+        final String fileName =
+            '${userId}_${DateTime.now().millisecondsSinceEpoch}';
+        final Reference storageReference =
+        FirebaseStorage.instance.ref().child('uploads/signup/$fileName');
+        // Upload image to Firebase Storage
+        final UploadTask uploadTask =
+        storageReference.putFile(imageFile.value!);
+        final TaskSnapshot taskSnapshot = await uploadTask;
+        // Get download URL
+        final String imageUrl = await taskSnapshot.ref.getDownloadURL();
+        uploadedImageUrl.value = imageUrl; // Reactive URL update
+        print('Image uploaded successfully: $imageUrl');
+      } else {
+        print('No image selected.');
+      }
+    } catch (e) {
+      print('Error during image picking/uploading: $e');
     }
   }
 
@@ -83,16 +115,16 @@ class SignupController extends GetxController {
     }
   }
 
-  Future<void> signup() async {
+  Future<void> signup(String number) async {
     try {
       isLoading.value = true;
 
       // Step 1: Firebase Authentication - Sign in with email and password
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email.text, password: password.text);
+          email: email.text, password: phonenumber.text);
 
       // Step 2: Upload user data
-      await saveUserData(FirebaseAuth.instance.currentUser!.uid);
+      await saveUserData(FirebaseAuth.instance.currentUser!.uid,number);
 
       // Step 3: Navigate to login screen
       Get.offAll(LoginScreen());
@@ -110,9 +142,9 @@ class SignupController extends GetxController {
     }
   }
 
-  void sendOTP(String phoneNumber) async {
+  Future<void> sendOTP(String phoneNumber, String role) async{
     // Ensure the phone number is not empty, starts with "+92", and is of correct length
-    if (phoneNumber.isEmpty || !phoneNumber.startsWith('+92') || phoneNumber.length != 13) {
+    if (phoneNumber.isEmpty || phoneNumber.length != 13){
       Get.snackbar(
         'Invalid Phone Number',
         'Please enter a valid Pakistani phone number with the country code +92 (e.g., +923001234567).',
@@ -147,6 +179,10 @@ class SignupController extends GetxController {
           print('Verification failed. Code: ${e.code}. Message: ${e.message}');
         },
         codeSent: (String verificationId, int? resendToken) async {
+          Get.to(() => OtpAuthenticationView(
+            initialVerificationId: verificationId,
+            docId: phoneNumber,
+          ));
           VerificationId.value = verificationId;
           Get.snackbar(
             'OTP Sent',
@@ -162,31 +198,41 @@ class SignupController extends GetxController {
               .set({
             'verificationId': verificationId,
             'timestamp': FieldValue.serverTimestamp(),
-            'userId': FirebaseAuth.instance.currentUser?.uid,
+            'userId': FirebaseAuth.instance.currentUser!.uid,
           });
 
-          Get.to(() => OtpAuthenticationView(
-              verificationId: verificationId, docId: phoneNumber));
+          // Get.to(() => OtpAuthenticationView(
+          //     verificationId: verificationId, docId: phoneNumber));
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           VerificationId.value = verificationId;
         },
       );
     } catch (e) {
+      isLoading.value = false;
       print('Error sending OTP: $e');
+      Get.snackbar(
+        'Error',
+        'An error occurred: $e',
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+      );
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  Future<void> saveUserData(String uid) async {
+  Future<void> saveUserData(String uid,String number) async {
     await _firestore.collection('userDetails').doc(uid).set({
       'userId': uid,
       'userName': name.text,
       'userEmail': email.text,
       'password': password.text,
       'gender': selectedGender.value,
-      'phoneNumber': phonenumber.text,
+      'phoneNumber': number,
       'image': uploadedImageUrl.value.isNotEmpty ? uploadedImageUrl.value : '',
       'role': userRole.value, // Store the selected role
+      'createdAt': FieldValue.serverTimestamp(),
     });
 
     // Success message and navigation

@@ -118,7 +118,17 @@ class _CustomerSignupState extends State<CustomerSignup> {
                     ),
                     SizedBox(height: 30.h),
                     GestureDetector(
-                      onTap: () => signupController.pickImage(),
+                      onTap: () async {
+                        try {
+                          // Generate a temporary unique ID for signup (e.g., UUID or timestamp)
+                          final String tempUserId = DateTime.now().millisecondsSinceEpoch.toString();
+                          print('Temporary User ID for signup: $tempUserId');
+                          // Call the image picker and upload function with the temporary ID
+                          await signupController.pickImageAndUpload(tempUserId);
+                        } catch (e) {
+                          print('Error occurred in onTap: $e');
+                        }
+                      },
                       child: Obx(
                             () => Container(
                           width: 106.w,
@@ -187,7 +197,7 @@ class _CustomerSignupState extends State<CustomerSignup> {
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 child: IntlPhoneField(
 
-                  controller: signupController.phonenumber,
+                  // controller: signupController.phonenumber,
                   flagsButtonPadding: EdgeInsets.only(left: 13.w),
                   cursorColor: Colors.black,
                   style: TextStyle(color: Colors.black),
@@ -222,6 +232,8 @@ class _CustomerSignupState extends State<CustomerSignup> {
                   onChanged: (phone) {
                     try {
                       debugPrint("Phone number entered: ${phone.completeNumber}");
+                      signupController.phonenumber.text= phone.completeNumber;
+                      debugPrint("Phone number text: ${signupController.phonenumber.text}");
                     } catch (e) {
                       debugPrint("Error processing phone number: $e");
                     }
@@ -263,7 +275,9 @@ class _CustomerSignupState extends State<CustomerSignup> {
                   // borderSide: BorderSide(color: Color(0xffBDD0EA),width: 1),
                   text: 'Continue',
                   textColor: AppColors.secondary,
-                  onPressed: signupController.signup,
+                  onPressed: (){
+                    signupController.signup(signupController.phonenumber.text);
+                  },
                   backgroundColor: AppColors.primary, // Custom background color
                 ),
               ),
