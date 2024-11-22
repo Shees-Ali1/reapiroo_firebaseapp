@@ -26,7 +26,7 @@ class _AddTaskMainState extends State<AddTaskMain> {
         isTitle: true,
         isTextField: false,
         isSecondIcon: false,
-        title: "Task Description",
+        title: "Task Description ",
         onBackTap: () {
           Get.back();
         },

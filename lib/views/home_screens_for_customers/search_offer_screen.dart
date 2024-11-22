@@ -41,15 +41,36 @@ class _SearchOfferScreenState extends State<SearchOfferScreen> {
   }
   Stream<List<Map<String, dynamic>>> fetchOffersStream(String taskId) {
     print('Fetching offers for taskId: $taskId');
-    return FirebaseFirestore.instance
-        .collection('bids')
-        .where('title', isEqualTo: widget.field.capitalize) // Filter by taskId
-        .snapshots()
-        .map((snapshot) {
+
+    // Create a query for the 'bids' collection
+    Query query = FirebaseFirestore.instance.collection('bids');
+
+    // Apply a filter if taskId is not "All"
+    if (taskId != "All") {
+      print("Applying filter for taskId: $taskId");
+      query = query.where('title', isEqualTo: taskId); // No need for capitalize unless explicitly needed
+    }
+
+    // Debug: Fetch all documents to check data in the collection
+    FirebaseFirestore.instance.collection('bids').get().then((snapshot) {
+      print("All documents in 'bids' collection:");
+      for (var doc in snapshot.docs) {
+        print("Document ID: ${doc.id}, Data: ${doc.data()}");
+      }
+    });
+
+    return query.snapshots().map((snapshot) {
       print('Snapshot received: ${snapshot.docs.length} docs');
+
       return snapshot.docs.map((doc) {
+        // Check and log document data
         final data = doc.data() as Map<String, dynamic>;
-        print('Bid data: $data');
+        print('Document ID: ${doc.id}, Data: $data');
+
+        // Check if title exists in the document
+        final firestoreTitle = data['title'] ?? "N/A";
+        print('Firestore title: $firestoreTitle');
+
         return {
           'image': AppImages.natalie_hales, // Example static image
           'name': data['firstName'] ?? "Bidder", // Using bidder's first name
@@ -77,7 +98,8 @@ class _SearchOfferScreenState extends State<SearchOfferScreen> {
         },
       ),
       body: SafeArea(
-        child: StreamBuilder<List<Map<String, dynamic>>>(
+        child:
+        StreamBuilder<List<Map<String, dynamic>>>(
           stream: fetchOffersStream(widget.field), // Pass the field as taskId
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {

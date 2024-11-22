@@ -125,13 +125,16 @@ class CustomerrBidBottomSheet extends StatelessWidget {
                   });
 
                   // Success Snackbar
-                  Get.snackbar("Success", "Your offer has been sent successfully!",
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white);
+                  Get.snackbar("Success", "Your bid has been sent successfully!",
+                      snackPosition: SnackPosition.TOP,
+                      backgroundColor: AppColors.primary,
+                      colorText: AppColors.secondary);
 
-                  // Close the bottom sheet
-                  Get.back();
+                  // Close the bottom sheet with a slight delay to ensure snackbar visibility
+                  Future.delayed(Duration(seconds: 2), () {
+                    Get.back();
+                  });
+
                 } catch (e) {
                   Get.snackbar("Error", "Failed to send bid: ${e.toString()}",
                       snackPosition: SnackPosition.BOTTOM,
