@@ -43,8 +43,8 @@ class _ProfileButtonState extends State<ProfileButton> {
               children: [
                 Image.asset(
                   widget.iconPath, // Use the passed icon asset path
-                  height: 17.54.h, // Set your desired height
-                  width: 21.54.w, // Set your desired width
+                  height: 22.54.h, // Set your desired height
+                  width: 25.54.w, // Set your desired width
                 ),
                 SizedBox(width: 20.39.h),
                 // Use a fixed color for the text
