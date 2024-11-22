@@ -58,40 +58,42 @@ class _RoleScreenState extends State<RoleScreen> {
             ),
           ),
           SizedBox(height: 40.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  signupController.userRole.value = "Customer";
-                  signupController.selectedIndex.value = 0;
-                  if (kDebugMode) {
-                    print(signupController.userRole.value);
-                  }
+          Obx(() {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    signupController.userRole.value = "Customer";
+                    signupController.selectedIndex.value = 0;
+                    if (kDebugMode) {
+                      print(signupController.userRole.value);
+                    }
 
-                },
-                child: buildContainer(
-                  'Customer',
-                  AppImages.Customer,
-                  isSelected: signupController.selectedIndex == 0,
+                  },
+                  child: buildContainer(
+                    'Customer',
+                    AppImages.Customer,
+                    isSelected: signupController.selectedIndex == 0,
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 19.w,
-              ),
-              GestureDetector(
-                onTap: () {
-                  signupController.userRole.value = "Tech";
-                  signupController.selectedIndex.value = 1;
-                },
-                child: buildContainer(
-                  'Tech',
-                  AppImages.Engineer,
-                  isSelected: signupController.selectedIndex == 1,
+                SizedBox(
+                  width: 19.w,
                 ),
-              ),
-            ],
-          ),
+                GestureDetector(
+                  onTap: () {
+                    signupController.userRole.value = "Tech";
+                    signupController.selectedIndex.value = 1;
+                  },
+                  child: buildContainer(
+                    'Tech',
+                    AppImages.Engineer,
+                    isSelected: signupController.selectedIndex == 1,
+                  ),
+                ),
+              ],
+            );
+          }),
           SizedBox(
             height: 33.h,
           ),
