@@ -23,7 +23,7 @@ import 'package:repairoo/widgets/my_svg.dart';
 import '../../controllers/servicecontroller.dart';
 
 class CustomerTaskHome extends StatefulWidget {
-  const CustomerTaskHome({super.key, this.service});
+  const CustomerTaskHome({Key? key, this.service}) : super(key: key);
 
   final String? service;
 
@@ -222,17 +222,7 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
       },
       child: Scaffold(
         backgroundColor: AppColors.secondary,
-        appBar: MyAppBar(
-          isMenu: false,
-          isNotification: false,
-          isTitle: true,
-          isTextField: false,
-          isSecondIcon: false,
-          title: "Task Description",
-          onBackTap: () {
-            Get.back();
-          },
-        ),
+
         body: SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -242,7 +232,7 @@ class _CustomerTaskHomeState extends State<CustomerTaskHome> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      height: 10.h,
+                      height: 40.h,
                     ),
                     Text(
                       widget.service ?? "",

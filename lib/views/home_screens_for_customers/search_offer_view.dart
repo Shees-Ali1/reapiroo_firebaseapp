@@ -9,6 +9,7 @@ import 'package:repairoo/const/images.dart';
 import 'package:repairoo/const/text_styles.dart';
 import 'package:repairoo/views/home_screen_for_tech/components/bid_bottom_sheet.dart';
 import 'package:repairoo/views/home_screens_for_customers/components/job_accepted_bottomsheet.dart';
+import 'package:repairoo/views/home_screens_for_customers/search_offer_screen.dart';
 import 'package:repairoo/widgets/app_bars.dart';
 
 import '../customerbidnotify.dart';
@@ -395,33 +396,124 @@ class _SearchOfferViewState extends State<SearchOfferView> {
                     ),
 
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Get.bottomSheet(
                           isScrollControlled: true,
                           isDismissible: true,
                           enableDrag: true,
-                          CustomerrBidBottomSheet(comingFrom: "customer",),
+                          CustomerrBidBottomSheet(comingFrom: "customer"),
                         );
                       },
-
                       child: Container(
                         width: 149.w,
                         height: 56.h,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.w),
-                          border: Border.all(
-                              color: AppColors.secondary
-                          ),
+                          border: Border.all(color: AppColors.secondary),
                           color: Color(0xffDDDDDD),
                         ),
                         alignment: Alignment.center,
-                        child: Text("Bid", style: jost600(22.sp, AppColors.primary),
+                        child: Text(
+                          "Bid",
+                          style: jost600(22.sp, AppColors.primary),
                         ),
                       ),
                     ),
                   ],
                 ),
+              ),
+              SizedBox(height: 20.h,),
+              GestureDetector(
+                onTap: () async {
+                  // Fetch the current user's UID from FirebaseAuth
+                  final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
+
+                  if (currentUserId == null) {
+                    Get.snackbar(
+                      "Error",
+                      "User not logged in.",
+                      backgroundColor: AppColors.primary, // Snackbar color
+                      colorText: Colors.white, // Snackbar text color
+                    );
+                    return;
+                  }
+
+                  try {
+                    // Query the 'bids' collection to get all bids for the current user with a matching price
+                    final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                        .collection('bids')
+                        .where('customerId', isEqualTo: currentUserId) // Assuming the current user is the customer
+                        .where('bidAmount', isEqualTo: widget.price) // Filter bids by price
+                        .get();
+
+                    if (querySnapshot.docs.isEmpty) {
+                      Get.snackbar(
+                        "Error",
+                        "No bids found with the matching price.",
+                        backgroundColor: AppColors.secondary, // Snackbar color
+                        colorText: Colors.white, // Snackbar text color
+                      );
+                      return;
+                    }
+
+                    // Loop through the documents to find the matching bid and remove it
+                    for (var doc in querySnapshot.docs) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      final String taskId = data['taskId']; // Get taskId from the bid document
+                      final String bidderId = data['bidderId']; // Assuming 'bidderId' exists in the bid document
+                      print("Bid Data: $data");  // Debug: Print the data for checking
+
+                      // Remove the specific bid based on the document ID
+                      await FirebaseFirestore.instance.collection('bids').doc(doc.id).delete();
+                      print("Bid removed successfully from 'bids' collection");
+
+                      // Add a notification about the bid rejection
+                      await FirebaseFirestore.instance.collection('Bid Notifications').add({
+                        'rejectedBy': currentUserId, // UID of the user who rejected the offer
+                        'bidderId': bidderId,        // UID of the bidder whose bid is rejected
+                        'taskId': taskId,            // Task ID associated with the bid
+                        'bidAmount': widget.price,   // The bid amount that was rejected
+                        'message': 'Your offer has been rejected by the customer', // Custom rejection message
+                        'timestamp': FieldValue.serverTimestamp(), // Timestamp of the rejection
+                      });
+
+                      print("Bid rejection notification added successfully");
+
+                      // Show confirmation message with appropriate background color
+                      Get.snackbar(
+                        "Rejected",
+                        "Offer has been rejected successfully.",
+                        backgroundColor: AppColors.primary, // Snackbar color
+                        colorText: Colors.white, // Snackbar text color
+                      );
+                    }
+
+                    // After rejecting, you can open any additional bottom sheets or perform further actions here
+                  } catch (e) {
+                    print("Error occurred: $e");
+                    Get.snackbar(
+                      "Error",
+                      "Failed to reject offer: $e",
+                      backgroundColor: AppColors.secondary, // Snackbar color
+                      colorText: Colors.white, // Snackbar text color
+                    );
+                  }
+                },
+                child: Container(
+                  height: 56.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.w),
+                    border: Border.all(color: AppColors.secondary),
+                    color: Colors.red,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Reject",
+                    style: jost600(22.sp, AppColors.secondary),
+                  ),
+                ),
               )
+
             ],
           ),
         ),

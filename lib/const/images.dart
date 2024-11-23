@@ -34,6 +34,9 @@ class AppImages{
   static const withdraw = 'assets/images/withdraw.png';
   static const arrow_right = 'assets/images/arrow_right.png';
   static const upload_img = 'assets/images/upload_img.png';
+  static const policy = 'assets/images/policy.png';
+  static const refund = 'assets/images/refund.png';
+  static const term = 'assets/images/term.png';
 
 
   //balaj

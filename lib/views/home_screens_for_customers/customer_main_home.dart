@@ -8,6 +8,7 @@ import 'package:repairoo/const/images.dart';
 import 'package:repairoo/controllers/home_controller.dart';
 import 'package:repairoo/controllers/nav_bar_controller.dart';
 import 'package:repairoo/views/customer_wallet_screen/wallet_screen.dart';
+import 'package:repairoo/views/home_screens_for_customers/add%20taskmain.dart';
 import 'package:repairoo/views/notification_screen/notification_screen.dart';
 import 'package:repairoo/views/home_screens_for_customers/components/services_container.dart';
 import 'package:repairoo/views/home_screens_for_customers/customer_task_home.dart';
@@ -125,7 +126,7 @@ class _CustomerMainHomeState extends State<CustomerMainHome> {
                         final service = topServiceController.topServices[index];
                         return GestureDetector(
                           onTap: () {
-                            Get.to(CustomerTaskHome(
+                            Get.to(AddTaskMain(
                               service: service['title'],
                             ));
                           },
