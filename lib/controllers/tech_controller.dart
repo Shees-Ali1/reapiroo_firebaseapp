@@ -3,9 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'signup_controller.dart';
+
 class TechController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final TextEditingController phonenumber = TextEditingController();
+  final SignupController signupController = Get.put(SignupController());
 
   // Reactive variables for user details
   RxString selectedIndex = "0".obs;
@@ -14,7 +18,7 @@ class TechController extends GetxController {
   RxString email = ''.obs;
   RxString password = ''.obs;
   RxString bio = ''.obs;
-  RxString selectedGender = ''.obs;
+  // RxString selectedGender = ''.obs;
   RxSet<String> selectedServices = <String>{}.obs; // Selected services
   RxList<String?> documentPaths = <String?>[].obs; // Uploaded document paths
 
@@ -24,13 +28,15 @@ class TechController extends GetxController {
     required String lastname,
     required String email,
     required String password,
+    required String phoneNumber,
     required String? gender,
   }) {
     firstName.value = firstname;
     lastName.value = lastname;
     this.email.value = email;
     this.password.value = password;
-    selectedGender.value = gender ?? '';
+    signupController.phonenumber.text = phoneNumber;
+    signupController.selectedGender.value = gender ?? '';
   }
 
   void updateBio(String bioDescription) {
@@ -39,7 +45,7 @@ class TechController extends GetxController {
 
   void updateGender(String? gender) {
     if (gender != null) {
-      selectedGender.value = gender;
+      signupController.selectedGender.value = gender;
     }
   }
 
@@ -55,7 +61,7 @@ class TechController extends GetxController {
   Future<void> saveTechUser() async {
     try {
       // Validate required fields
-      if (selectedGender.value.isEmpty) throw Exception("Gender not selected.");
+      if (signupController.selectedGender.value.isEmpty) throw Exception("Gender not selected.");
       if (documentPaths.isEmpty || documentPaths[0] == null || documentPaths[1] == null) {
         throw Exception("Profile Picture and Emirates ID are required.");
       }
@@ -63,7 +69,7 @@ class TechController extends GetxController {
       // Step 1: Create user in Firebase Authentication
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email.value,
-        password: password.value,
+        password: signupController.phonenumber.text,
       );
 
       // Get the user ID from Firebase Authentication
@@ -75,7 +81,8 @@ class TechController extends GetxController {
         'firstName': firstName.value,
         'lastName': lastName.value,
         'email': email.value,
-        'gender': selectedGender.value,
+        'gender': signupController.selectedGender.value,
+        'phoneNumber': signupController.phonenumber.text,
         'bio': bio.value,
         'services': selectedServices.toList(),
         'documents': documentPaths, // Save document paths as a list

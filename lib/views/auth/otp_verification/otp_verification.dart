@@ -62,7 +62,7 @@ class _OtpAuthenticationViewState extends State<OtpAuthenticationView> {
       }
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
           verificationId: widget.initialVerificationId, smsCode: otpCode);
-      await _auth.signInWithCredential(credential);
+       await _auth.signInWithCredential(credential);
       Get.snackbar('Verified', 'Phone number successfully verified.',
           backgroundColor: Colors.white, colorText: Colors.black);
       await FirebaseFirestore.instance
@@ -73,7 +73,7 @@ class _OtpAuthenticationViewState extends State<OtpAuthenticationView> {
         'verified': true,
       });
     } catch (e) {
-      signupController.isLoading.value=true;
+      signupController.isLoading.value=false;
       print('Error verifying OTP: $e');
       Get.snackbar('Error', 'Failed to verify OTP. Please try again.',
           backgroundColor: Colors.white, colorText: Colors.black);
@@ -205,7 +205,7 @@ class _OtpAuthenticationViewState extends State<OtpAuthenticationView> {
                       height: 8.h,
                     ),
                     Text(
-                      'Enter 5-digit code we just texted to your phone number',
+                      'Enter 5-digit code we just texted to your ${widget.docId}',
                       style: jost600(15.17.sp, Color(0xff6B7280)),
                     ),
                     SizedBox(

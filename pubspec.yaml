@@ -69,6 +69,7 @@ dependencies:
   flutter_sound:
   carousel_slider:
   intl:
+  twilio_flutter: ^0.9.0
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,6 +28,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool isloading = false;
   final SignupController signupController = Get.put(SignupController());
   String userRole = '';
   final UserController userVM = Get.put(UserController());
@@ -80,51 +82,52 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: 91.h,
               ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: IntlPhoneField(
-
-              flagsButtonPadding: EdgeInsets.only(left: 13.w),
-              cursorColor: Colors.black,
-              style: TextStyle(color: Colors.black),
-              showDropdownIcon: false,
-              decoration: InputDecoration(
-                hintText: '0551234567',
-                filled: true,
-                fillColor: Color(0xffFAFAFA),
-                contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                counterText: '',
-                hintStyle: TextStyle(
-                  color: Colors.grey,
-                  fontFamily: 'jost',
-                  fontSize: 14.65.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(13.31.r),
-                  borderSide: BorderSide(color: Colors.white),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(13.31.r),
-                  borderSide: BorderSide(color: Colors.white),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(13.31.r),
-                  borderSide: BorderSide(color: Colors.white),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: IntlPhoneField(
+                  flagsButtonPadding: EdgeInsets.only(left: 13.w),
+                  cursorColor: Colors.black,
+                  style: TextStyle(color: Colors.black),
+                  showDropdownIcon: false,
+                  decoration: InputDecoration(
+                    hintText: '0551234567',
+                    filled: true,
+                    fillColor: Color(0xffFAFAFA),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                    counterText: '',
+                    hintStyle: TextStyle(
+                      color: Colors.grey,
+                      fontFamily: 'jost',
+                      fontSize: 14.65.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(13.31.r),
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(13.31.r),
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(13.31.r),
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
+                  initialCountryCode: 'AE',
+                  onChanged: (phone) {
+                    try {
+                      debugPrint(
+                          "Phone number entered: ${phone.completeNumber}");
+                      signupController.phonenumber.text = phone.completeNumber;
+                      debugPrint(
+                          "Phone number text: ${signupController.phonenumber.text}");
+                    } catch (e) {
+                      debugPrint("Error processing phone number: $e");
+                    }
+                  },
                 ),
               ),
-              initialCountryCode: 'AE',
-              onChanged: (phone) {
-                try {
-                  debugPrint("Phone number entered: ${phone.completeNumber}");
-                  signupController.phonenumber.text= phone.completeNumber;
-                  debugPrint("Phone number text: ${signupController.phonenumber.text}");
-                } catch (e) {
-                  debugPrint("Error processing phone number: $e");
-                }
-              },
-            ),
-          ),
 
               // // Email input field
               // Padding(
@@ -187,38 +190,93 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: 76.h,
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: CustomElevatedButton(
-                  text: 'Login',
-                  textColor: AppColors.primary,
-                  onPressed: ()  async {
-                    await FirebaseAuth.instance.verifyPhoneNumber(
-                      phoneNumber: signupController.phonenumber.text,
-                      verificationCompleted: (phoneAuthCredential) {},
-                      verificationFailed: (error) {
-                        log(error.toString());
-                      },
-                      codeSent: (verificationId, forceResendingToken) {
+          isloading
+              ? const CircularProgressIndicator(
+            color: Colors.white,
+          )
+              : Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: CustomElevatedButton(
+              text: 'Login',
+              textColor: AppColors.primary,
+              onPressed: () async {
+                setState(() {
+                  isloading = true;
+                });
 
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => OtpAuthenticationView(
-                                  initialVerificationId: verificationId, docId: signupController.phonenumber.text,
-                                )));
-                      },
-                      codeAutoRetrievalTimeout: (verificationId) {
-                        log("Auto Retireval timeout");
-                      },
-                    );
-                    // authService.sendOtp(signupController.phonenumber.text);
-                    // signupController.sendOTP(signupController.phonenumber.text,signupController.userRole.value);
-                  },
-                  backgroundColor: AppColors.secondary, // Custom background color
-                ),
-              ),
-              SizedBox(
+                try {
+                  await FirebaseAuth.instance.verifyPhoneNumber(
+                    phoneNumber: signupController.phonenumber.text,
+                    verificationCompleted: (phoneAuthCredential) {
+                      log("Verification completed automatically.");
+                    },
+                    verificationFailed: (error) {
+                      setState(() {
+                        isloading = false;
+                      });
+                      log(error.toString());
+                      Get.snackbar(
+                        'Verification Failed',
+                        error.message ?? 'An unexpected error occurred',
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                      );
+                    },
+                    codeSent: (verificationId, forceResendingToken) {
+                      setState(() {
+                        isloading = false;
+                      });
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OtpAuthenticationView(
+                            initialVerificationId: verificationId,
+                            docId: signupController.phonenumber.text,
+                          ),
+                        ),
+                      );
+
+                      // Save the verification ID to Firestore
+                      FirebaseFirestore.instance
+                          .collection('UserOtp')
+                          .doc(signupController.phonenumber.text)
+                          .set({
+                        'verificationId': verificationId,
+                        'timestamp': FieldValue.serverTimestamp(),
+                        'userId': FirebaseAuth.instance.currentUser?.uid ?? '',
+                      });
+
+                      Get.snackbar(
+                        'OTP Sent',
+                        'A 6-digit OTP has been sent to your phone',
+                        backgroundColor: Colors.white,
+                        colorText: Colors.black,
+                      );
+                    },
+                    codeAutoRetrievalTimeout: (verificationId) {
+                      log("Auto retrieval timeout occurred.");
+                    },
+                  );
+                } catch (e) {
+                  setState(() {
+                    isloading = false;
+                  });
+
+                  log(e.toString());
+                  Get.snackbar(
+                    'Error',
+                    'Failed to send OTP. Please try again.',
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                  );
+                }
+              },
+              backgroundColor: AppColors.secondary, // Custom background color
+            ),
+          ),
+
+          SizedBox(
                 height: 40.h,
               ),
               GestureDetector(
