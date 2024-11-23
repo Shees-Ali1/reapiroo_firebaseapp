@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -11,6 +14,7 @@ import 'package:repairoo/views/auth/signup_view/role_screen.dart';
 
 import '../../../const/color.dart';
 import '../../../const/images.dart';
+import '../../../twilio/twilio_services.dart';
 import '../../../widgets/custom_button.dart';
 import '../../bottom_nav/bottom_nav.dart';
 import '../../home_screens_for_customers/customer_main_home.dart';
@@ -32,6 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  TwilioAuthService authService = TwilioAuthService();
 
   // FocusNode _phoneFocusNode = FocusNode();
   // @override
@@ -187,8 +192,28 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: CustomElevatedButton(
                   text: 'Login',
                   textColor: AppColors.primary,
-                  onPressed: () {
-                    signupController.sendOTP(signupController.phonenumber.text,signupController.userRole.value);
+                  onPressed: ()  async {
+                    await FirebaseAuth.instance.verifyPhoneNumber(
+                      phoneNumber: signupController.phonenumber.text,
+                      verificationCompleted: (phoneAuthCredential) {},
+                      verificationFailed: (error) {
+                        log(error.toString());
+                      },
+                      codeSent: (verificationId, forceResendingToken) {
+
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => OtpAuthenticationView(
+                                  initialVerificationId: verificationId, docId: signupController.phonenumber.text,
+                                )));
+                      },
+                      codeAutoRetrievalTimeout: (verificationId) {
+                        log("Auto Retireval timeout");
+                      },
+                    );
+                    // authService.sendOtp(signupController.phonenumber.text);
+                    // signupController.sendOTP(signupController.phonenumber.text,signupController.userRole.value);
                   },
                   backgroundColor: AppColors.secondary, // Custom background color
                 ),
