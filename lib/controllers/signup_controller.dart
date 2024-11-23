@@ -260,7 +260,7 @@ import 'package:repairoo/views/auth/otp_verification/otp_verification.dart';
 class SignupController extends GetxController {
   RxBool isLoading = false.obs;
   var selectedIndex = 0.obs;
-  var userRole = ''.obs;
+  var userRole = 'Customer'.obs;
   var selectedGender = ''.obs;
 
   RxString VerificationId = ''.obs;

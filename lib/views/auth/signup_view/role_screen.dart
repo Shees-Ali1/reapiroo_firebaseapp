@@ -22,7 +22,7 @@ class RoleScreen extends StatefulWidget {
 
 class _RoleScreenState extends State<RoleScreen> {
   final UserController userVM = Get.find<UserController>();
-  final SignupController signupController = Get.find<SignupController>();
+  final SignupController signupController = Get.put(SignupController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(

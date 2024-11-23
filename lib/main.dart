@@ -9,6 +9,7 @@ import 'package:repairoo/controllers/servicecontroller.dart';
 import 'package:repairoo/controllers/user_controller.dart';
 import 'package:repairoo/views/auth/signup_view/role_screen.dart';
 import 'package:repairoo/views/splash_screen/splash_screen.dart';
+
 import 'firebase_options.dart';
 
 void main() async {
@@ -24,6 +25,7 @@ void main() async {
 
   Get.put(UserController());
   Get.put(AudioController());
+  // Get.put(PhoneAuthController());
   Get.put(TechHomeController());
   Get.put(HomeController());
   Get.put(ServiceController());

@@ -101,10 +101,23 @@ class _AppNavBarState extends State<AppNavBar> {
     double iconScale = iconHeight / 20;
 
     // Move bottomBarPages into build method to ensure userVM is accessible
-    List<Widget> bottomBarPages = [
-      userRole == "Tech" ? HomeScreen() : CustomerMainHome(),
-      userRole == "Tech" ? bookingTech() : BookingScreenMain(),
-      // if (userVM.userRole.value != "Customer") OrderScreen(),
+    // List<Widget> bottomBarPages = [
+    //   userRole == "Tech" ? HomeScreen() : CustomerMainHome(),
+    //   userRole == "Tech" ? bookingTech() : BookingScreenMain(),
+    //   // if (userVM.userRole.value != "Customer") OrderScreen(),
+    //   const ChatsScreenMain(),
+    //   const ProfileScreen(),
+    // ];
+    List<Widget> bottomBarPages = widget.userRole == "Customer"
+        ? [
+      CustomerMainHome(),
+      bookingTech(),
+      const ChatsScreenMain(),
+      const ProfileScreen(),
+    ]
+        : [
+      HomeScreen(),
+      const BookingScreenMain(),
       const ChatsScreenMain(),
       const ProfileScreen(),
     ];

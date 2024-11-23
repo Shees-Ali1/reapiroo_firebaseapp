@@ -15,7 +15,7 @@ import 'package:repairoo/views/auth/signup_view/role_screen.dart';
 
 import '../../../const/color.dart';
 import '../../../const/images.dart';
-import '../../../twilio/twilio_services.dart';
+
 import '../../../widgets/custom_button.dart';
 import '../../bottom_nav/bottom_nav.dart';
 import '../../home_screens_for_customers/customer_main_home.dart';
@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  TwilioAuthService authService = TwilioAuthService();
+
 
   // FocusNode _phoneFocusNode = FocusNode();
   // @override

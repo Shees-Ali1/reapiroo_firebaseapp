@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:repairoo/const/color.dart';
+import 'package:repairoo/controllers/signup_controller.dart';
 
 class CustomElevatedButton extends StatelessWidget {
   final String text;
@@ -25,9 +27,11 @@ class CustomElevatedButton extends StatelessWidget {
     this.borderSide,
     this.borderRadius,
   });
+  final SignupController signupController = Get.put(SignupController());
 
   @override
   Widget build(BuildContext context) {
+
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -38,21 +42,25 @@ class CustomElevatedButton extends StatelessWidget {
         ),
         minimumSize: Size(width ?? double.infinity, height ?? 51.h), // Use width and height or default
       ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16.h),
-        child: text.isEmpty // Show spinner when text is empty
-            ? CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.white), // White spinner color
-        )
-            : Text(
-          text,
-          style: GoogleFonts.jost(
-            fontWeight: FontWeight.w500,
-            color: textColor ?? AppColors.buttontext, // Default text color
-            fontSize: fontSize ?? 19.sp, // Default text size
+      child:Obx(() {
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.h),
+          child: signupController.isLoading.value
+              ? CircularProgressIndicator(
+            color: Colors.white,
+          )
+              : Text(
+            text,
+            style: GoogleFonts.jost(
+              fontWeight: FontWeight.w500,
+              color: textColor ??
+                  AppColors
+                      .buttontext, // Use textColor or default text color
+              fontSize: fontSize ?? 19.sp, // Text size
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }
